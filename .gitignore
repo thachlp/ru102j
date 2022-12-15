@@ -15,3 +15,8 @@
 out/
 !**/src/main/**/out/
 !**/src/test/**/out/
+
+.classpath
+.project
+.settings/
+target/
