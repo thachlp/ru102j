@@ -50,7 +50,9 @@ public class MetricDaoRedisZsetImpl implements MetricDao {
                               ZonedDateTime dateTime) {
         String metricKey = RedisSchema.getDayMetricKey(siteId, unit, dateTime);
         Integer minuteOfDay = getMinuteOfDay(dateTime);
-        jedis.zadd(metricKey, minuteOfDay, String.format("%.1f:%d", value, minuteOfDay));
+
+        jedis.zadd(metricKey, minuteOfDay, new MeasurementMinute(value, minuteOfDay).toString());
+        jedis.expire(metricKey, METRIC_EXPIRATION_SECONDS);
     }
 
     /**
@@ -183,8 +185,7 @@ public class MetricDaoRedisZsetImpl implements MetricDao {
         }
 
         public String toString() {
-            return decimalFormat.format(measurement) + ':' +
-                    String.valueOf(minuteOfDay);
+            return decimalFormat.format(measurement) + ':' + minuteOfDay;
         }
     }
 }
