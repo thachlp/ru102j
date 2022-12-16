@@ -5,6 +5,7 @@ import com.redislabs.university.RU102J.api.SiteStats;
 import com.redislabs.university.RU102J.script.CompareAndUpdateScript;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
+import redis.clients.jedis.Response;
 import redis.clients.jedis.Transaction;
 
 import java.time.ZoneOffset;
@@ -47,7 +48,7 @@ public class SiteStatsDaoRedisImpl implements SiteStatsDao {
             ZonedDateTime day = reading.getDateTime();
             String key = RedisSchema.getSiteStatsKey(siteId, day);
 
-            updateBasic(jedis, key, reading);
+            updateOptimized(jedis, key, reading);
         }
     }
 
@@ -60,19 +61,19 @@ public class SiteStatsDaoRedisImpl implements SiteStatsDao {
         jedis.expire(key, weekSeconds);
 
         String maxWh = jedis.hget(key, SiteStats.maxWhField);
-        if (maxWh == null || reading.getWhGenerated() > Double.valueOf(maxWh)) {
+        if (maxWh == null || reading.getWhGenerated() > Double.parseDouble(maxWh)) {
             jedis.hset(key, SiteStats.maxWhField,
                     String.valueOf(reading.getWhGenerated()));
         }
 
         String minWh = jedis.hget(key, SiteStats.minWhField);
-        if (minWh == null || reading.getWhGenerated() < Double.valueOf(minWh)) {
+        if (minWh == null || reading.getWhGenerated() < Double.parseDouble(minWh)) {
             jedis.hset(key, SiteStats.minWhField,
                     String.valueOf(reading.getWhGenerated()));
         }
 
         String maxCapacity = jedis.hget(key, SiteStats.maxCapacityField);
-        if (maxCapacity == null || getCurrentCapacity(reading) > Double.valueOf(maxCapacity)) {
+        if (maxCapacity == null || getCurrentCapacity(reading) > Double.parseDouble(maxCapacity)) {
             jedis.hset(key, SiteStats.maxCapacityField,
                     String.valueOf(getCurrentCapacity(reading)));
         }
@@ -80,8 +81,38 @@ public class SiteStatsDaoRedisImpl implements SiteStatsDao {
 
     // Challenge #3
     private void updateOptimized(Jedis jedis, String key, MeterReading reading) {
-        // START Challenge #3
-        // END Challenge #3
+        String reportingTime = ZonedDateTime.now(ZoneOffset.UTC).toString();
+        Transaction tranCounter = jedis.multi();
+        tranCounter.hset(key, SiteStats.reportingTimeField, reportingTime);
+        tranCounter.hincrBy(key, SiteStats.countField, 1);
+        tranCounter.expire(key, weekSeconds);
+        tranCounter.exec();
+
+        Transaction tranGetData = jedis.multi();
+        Response<String> maxWhResponse = tranGetData.hget(key, SiteStats.maxWhField);
+        Response<String> minWhResponse = tranGetData.hget(key, SiteStats.minWhField);
+        Response<String> maxCapWhResponse = tranGetData.hget(key, SiteStats.maxCapacityField);
+        tranGetData.exec();
+
+        Transaction tranUpdateData = jedis.multi();
+        String maxWh = maxWhResponse.get();
+        if (maxWh == null || reading.getWhGenerated() > Double.parseDouble(maxWh)) {
+            tranUpdateData.hset(key, SiteStats.maxWhField,
+                String.valueOf(reading.getWhGenerated()));
+        }
+
+        String minWh = minWhResponse.get();
+        if (minWh == null || reading.getWhGenerated() < Double.parseDouble(minWh)) {
+            tranUpdateData.hset(key, SiteStats.minWhField,
+                String.valueOf(reading.getWhGenerated()));
+        }
+
+        String maxCapacity = maxCapWhResponse.get();
+        if (maxCapacity == null || getCurrentCapacity(reading) > Double.parseDouble(maxCapacity)) {
+            tranUpdateData.hset(key, SiteStats.maxCapacityField,
+                String.valueOf(getCurrentCapacity(reading)));
+        }
+        tranUpdateData.exec();
     }
 
     private Double getCurrentCapacity(MeterReading reading) {
