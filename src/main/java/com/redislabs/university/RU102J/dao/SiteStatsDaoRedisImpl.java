@@ -81,38 +81,16 @@ public class SiteStatsDaoRedisImpl implements SiteStatsDao {
 
     // Challenge #3
     private void updateOptimized(Jedis jedis, String key, MeterReading reading) {
-        String reportingTime = ZonedDateTime.now(ZoneOffset.UTC).toString();
-        Transaction tranCounter = jedis.multi();
-        tranCounter.hset(key, SiteStats.reportingTimeField, reportingTime);
-        tranCounter.hincrBy(key, SiteStats.countField, 1);
-        tranCounter.expire(key, weekSeconds);
-        tranCounter.exec();
-
-        Transaction tranGetData = jedis.multi();
-        Response<String> maxWhResponse = tranGetData.hget(key, SiteStats.maxWhField);
-        Response<String> minWhResponse = tranGetData.hget(key, SiteStats.minWhField);
-        Response<String> maxCapWhResponse = tranGetData.hget(key, SiteStats.maxCapacityField);
-        tranGetData.exec();
-
-        Transaction tranUpdateData = jedis.multi();
-        String maxWh = maxWhResponse.get();
-        if (maxWh == null || reading.getWhGenerated() > Double.parseDouble(maxWh)) {
-            tranUpdateData.hset(key, SiteStats.maxWhField,
-                String.valueOf(reading.getWhGenerated()));
+        try (Transaction trans = jedis.multi()) {
+            String reportingTime = ZonedDateTime.now(ZoneOffset.UTC).toString();
+            trans.hset(key, SiteStats.reportingTimeField, reportingTime);
+            trans.hincrBy(key, SiteStats.countField, 1);
+            trans.expire(key, weekSeconds);
+            this.compareAndUpdateScript.updateIfGreater(trans, key, SiteStats.maxWhField, reading.getWhGenerated());
+            this.compareAndUpdateScript.updateIfLess(trans, key, SiteStats.minWhField, reading.getWhGenerated());
+            this.compareAndUpdateScript.updateIfGreater(trans, key, SiteStats.maxCapacityField, getCurrentCapacity(reading));
+            trans.exec();
         }
-
-        String minWh = minWhResponse.get();
-        if (minWh == null || reading.getWhGenerated() < Double.parseDouble(minWh)) {
-            tranUpdateData.hset(key, SiteStats.minWhField,
-                String.valueOf(reading.getWhGenerated()));
-        }
-
-        String maxCapacity = maxCapWhResponse.get();
-        if (maxCapacity == null || getCurrentCapacity(reading) > Double.parseDouble(maxCapacity)) {
-            tranUpdateData.hset(key, SiteStats.maxCapacityField,
-                String.valueOf(getCurrentCapacity(reading)));
-        }
-        tranUpdateData.exec();
     }
 
     private Double getCurrentCapacity(MeterReading reading) {
