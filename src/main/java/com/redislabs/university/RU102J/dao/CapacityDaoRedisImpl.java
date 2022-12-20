@@ -36,9 +36,8 @@ public class CapacityDaoRedisImpl implements CapacityDao {
 
         try (Jedis jedis = jedisPool.getResource()) {
             Pipeline p = jedis.pipelined();
-            Response<Set<Tuple>> lowCapacity = p.zrangeWithScores(key, 0, limit-1);
-            Response<Set<Tuple>> highCapacity = p.zrevrangeWithScores(key, 0,
-                    limit-1);
+            Response<Set<Tuple>> lowCapacity = p.zrangeWithScores(key, 0L, limit - 1L);
+            Response<Set<Tuple>> highCapacity = p.zrevrangeWithScores(key, 0L,limit - 1L);
             p.sync();
 
             List<SiteCapacityTuple> lowCapacityList = lowCapacity.get().stream()

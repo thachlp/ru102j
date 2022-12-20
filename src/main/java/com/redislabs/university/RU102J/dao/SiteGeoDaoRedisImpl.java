@@ -10,7 +10,7 @@ import java.util.stream.Collectors;
 
 public class SiteGeoDaoRedisImpl implements SiteGeoDao {
     private JedisPool jedisPool;
-    final static private Double capacityThreshold = 0.2;
+    private static final Double capacityThreshold = 0.2;
 
     public SiteGeoDaoRedisImpl(JedisPool jedisPool) {
         this.jedisPool = jedisPool;
@@ -117,8 +117,8 @@ public class SiteGeoDaoRedisImpl implements SiteGeoDao {
                  throw new IllegalArgumentException("Coordinate required for Geo " +
                          "insert.");
              }
-             Double longitude = site.getCoordinate().getGeoCoordinate().getLongitude();
-             Double latitude = site.getCoordinate().getGeoCoordinate().getLatitude();
+             double longitude = site.getCoordinate().getGeoCoordinate().getLongitude();
+             double latitude = site.getCoordinate().getGeoCoordinate().getLatitude();
              jedis.geoadd(RedisSchema.getSiteGeoKey(), longitude, latitude,
                      key);
          }

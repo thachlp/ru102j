@@ -2,7 +2,7 @@ version: "3.9"
 services:
   redis:
     container_name: redis_ru102j
-    image: "redislabs/redistimeseries"
+    image: "redis:latest"
     ports:
       - "6379:6379"
     volumes:
