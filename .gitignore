@@ -22,3 +22,5 @@ out/
 target/
 
 **/.DS_Store
+*.aof
+*.rdb
