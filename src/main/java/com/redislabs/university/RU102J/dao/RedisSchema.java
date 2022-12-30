@@ -30,7 +30,7 @@ public class RedisSchema {
     public static String getSiteStatsKey(Long siteId, ZonedDateTime dateTime) {
         return KeyHelper.getKey("sites:stats:" +
                 getYearMonthDay(dateTime) + ":" +
-                String.valueOf(siteId));
+                siteId);
     }
 
     // limiter:[name]:[duration]:[maxHits]
@@ -39,8 +39,8 @@ public class RedisSchema {
                                     long maxHits) {
         return KeyHelper.getKey("limiter:" +
                 name + ":" +
-                String.valueOf(minuteBlock) + ":" +
-                String.valueOf(maxHits));
+                minuteBlock + ":" +
+                maxHits);
     }
 
     // sites:geo
@@ -65,7 +65,7 @@ public class RedisSchema {
                 ":" +
                 getYearMonthDay(dateTime) +
                 ":" +
-                String.valueOf(siteId);
+                siteId;
     }
 
     // sites:feed
@@ -77,19 +77,19 @@ public class RedisSchema {
     // sites:feed:[siteId]
     // Redis type: stream
     static String getFeedKey(long siteId) {
-        return KeyHelper.getKey("sites:feed:" + String.valueOf(siteId));
+        return KeyHelper.getKey("sites:feed:" + siteId);
     }
 
     // Return the year and month in the form YEAR-MONTH-DAY
     private static String getYearMonthDay(ZonedDateTime dateTime) {
         return String.valueOf(dateTime.getYear()) + "-" +
-                String.valueOf(dateTime.getMonthValue()) + "-" +
-                String.valueOf(dateTime.getDayOfMonth());
+                    dateTime.getMonthValue() + "-" +
+                    dateTime.getDayOfMonth();
     }
 
     // sites:ts:[siteId]:[unit]
     // Redis type: RedisTimeSeries
     static String getTSKey(Long siteId, MetricUnit unit) {
-        return KeyHelper.getKey("sites:ts:" + String.valueOf(siteId) + ":" + unit.toString());
+        return KeyHelper.getKey("sites:ts:" + siteId + ":" + unit.toString());
     }
 }

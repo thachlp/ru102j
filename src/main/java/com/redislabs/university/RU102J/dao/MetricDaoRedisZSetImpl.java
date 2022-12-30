@@ -5,7 +5,6 @@ import com.redislabs.university.RU102J.api.MeterReading;
 import com.redislabs.university.RU102J.api.MetricUnit;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
-import redis.clients.jedis.Pipeline;
 import redis.clients.jedis.Tuple;
 
 import java.text.DecimalFormat;
@@ -21,15 +20,16 @@ import java.util.*;
  * after this number of days.
  *
  */
-public class MetricDaoRedisZsetImpl implements MetricDao {
-    static private final Integer MAX_METRIC_RETENTION_DAYS = 30;
-    static private final Integer MAX_DAYS_TO_RETURN = 7;
-    static private final Integer METRICS_PER_DAY = 60 * 24;
-    static private final Integer METRIC_EXPIRATION_SECONDS =
+public class MetricDaoRedisZSetImpl implements MetricDao {
+
+    private static final Integer MAX_METRIC_RETENTION_DAYS = 30;
+    private static final Integer MAX_DAYS_TO_RETURN = 7;
+    private static final Integer METRICS_PER_DAY = 60 * 24;
+    private static final Integer METRIC_EXPIRATION_SECONDS =
             60 * 60 * 24 * MAX_METRIC_RETENTION_DAYS + 1;
     private final JedisPool jedisPool;
 
-    public MetricDaoRedisZsetImpl(JedisPool jedisPool) {
+    public MetricDaoRedisZSetImpl(JedisPool jedisPool) {
         this.jedisPool = jedisPool;
     }
 
@@ -71,8 +71,8 @@ public class MetricDaoRedisZsetImpl implements MetricDao {
 
         List<Measurement> measurements = new ArrayList<>();
         ZonedDateTime currentDate = time;
-        Integer count = limit;
-        Integer iterations = 0;
+        int count = limit;
+        int iterations = 0;
 
         // This loop extracts the elements of successive
         // sorted sets until it reaches the requested limit.
@@ -149,7 +149,6 @@ public class MetricDaoRedisZsetImpl implements MetricDao {
     /**
      * Utility class to convert between our sorted set members and their
      * constituent measurement and minute values.
-     *
      * Also rounds decimals before storing them.
      */
     public static class MeasurementMinute {

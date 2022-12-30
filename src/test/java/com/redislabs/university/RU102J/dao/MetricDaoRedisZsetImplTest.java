@@ -6,7 +6,6 @@ import com.redislabs.university.RU102J.api.MeterReading;
 import com.redislabs.university.RU102J.api.MetricUnit;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import java.time.ZoneOffset;
@@ -20,8 +19,8 @@ import static org.junit.Assert.*;
 public class MetricDaoRedisZsetImplTest extends JedisDaoTestBase {
 
     private List<MeterReading> readings;
-    private Long siteId = 1L;
-    private ZonedDateTime startingDate = ZonedDateTime.now(ZoneOffset.UTC);
+    private final Long siteId = 1L;
+    private final ZonedDateTime startingDate = ZonedDateTime.now(ZoneOffset.UTC);
 
     @After
     public void flush() {
@@ -63,7 +62,7 @@ public class MetricDaoRedisZsetImplTest extends JedisDaoTestBase {
     }
 
     private void testInsertAndRetrieve(int limit) {
-        MetricDao metricDao = new MetricDaoRedisZsetImpl(jedisPool);
+        MetricDao metricDao = new MetricDaoRedisZSetImpl(jedisPool);
         for (MeterReading reading : readings) {
             metricDao.insert(reading);
         }

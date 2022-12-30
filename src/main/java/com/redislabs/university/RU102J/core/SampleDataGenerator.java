@@ -12,14 +12,14 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class SampleDataGenerator {
-    private static final Integer seed = 42;
-    private static final double maxTemperatureC = 30.0;
+    private static final Integer SEED = 42;
+    private static final double MAX_TEMPERATURE_C = 30.0;
     private final JedisPool jedisPool;
     private final Random random;
 
     public SampleDataGenerator(JedisPool jedisPool) {
         this.jedisPool = jedisPool;
-        this.random = new Random(seed);
+        this.random = new Random(SEED);
     }
 
     /* Generate historical data for all sites starting from the
@@ -29,13 +29,13 @@ public class SampleDataGenerator {
     public void generateHistorical(int days) {
         System.out.print("Generating sample historical data...");
         if (days < 0 || days > 365) {
-            throw new IllegalArgumentException("Invalid days " + String.valueOf(days) +
+            throw new IllegalArgumentException("Invalid days " + days +
                     " for historical request.");
         }
 
         SiteStatsDao siteStatsDao = new SiteStatsDaoRedisImpl(jedisPool);
         CapacityDao capacityDao = new CapacityDaoRedisImpl(jedisPool);
-        MetricDao metricDao = new MetricDaoRedisZsetImpl(jedisPool);
+        MetricDao metricDao = new MetricDaoRedisZSetImpl(jedisPool);
         FeedDao feedDao = new FeedDaoRedisImpl(jedisPool);
         MeterReadingResource meterResource = new MeterReadingResource(siteStatsDao, metricDao,
                 capacityDao, feedDao);
@@ -53,7 +53,7 @@ public class SampleDataGenerator {
         for (Site site : sortedSites) {
             Double maxCapacity = getMaxMinuteWHGenerated(site.getCapacity());
             Double currentCapacity = getNextValue(maxCapacity);
-            Double currentTemperature = getNextValue(maxTemperatureC);
+            Double currentTemperature = getNextValue(MAX_TEMPERATURE_C);
             Double currentUsage = getInitialMinuteWHUsed(maxCapacity);
             ZonedDateTime currentTime = ZonedDateTime.now(ZoneOffset.UTC).minusMinutes(minuteDays);
 
@@ -110,11 +110,7 @@ public class SampleDataGenerator {
         if (random.nextBoolean()) {
             return current + stepSize;
         } else {
-            if (current - stepSize < 0.0) {
-                return 0.0;
-            } else {
-                return current - stepSize;
-            }
+            return Math.max(current - stepSize, 0.0);
         }
     }
 

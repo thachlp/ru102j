@@ -12,8 +12,9 @@ import java.util.List;
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 public class MeterReadingResource {
-    final static private Integer MAX_RECENT_FEEDS = 1000;
-    final static private Integer DEFAULT_RECENT_FEEDS = 100;
+
+    private static final Integer MAX_RECENT_FEEDS = 1000;
+    private static final Integer DEFAULT_RECENT_FEEDS = 100;
     private final SiteStatsDao siteStatsDao;
     private final MetricDao metricDao;
     private final CapacityDao capacityDao;
