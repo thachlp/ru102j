@@ -12,10 +12,10 @@ import java.util.Objects;
  * When set to "false", the query only considers geolocation.
  */
 public class GeoQuery {
-    private Coordinate coordinate;
-    private Double radius;
-    private GeoUnit radiusUnit;
-    private boolean onlyExcessCapacity;
+    private final Coordinate coordinate;
+    private final Double radius;
+    private final GeoUnit radiusUnit;
+    private final boolean onlyExcessCapacity;
 
     public GeoQuery(Coordinate coordinate, Double radius, String radiusUnit) {
         this.coordinate = coordinate;

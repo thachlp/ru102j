@@ -19,7 +19,8 @@ import java.util.List;
  *
  */
 public class MetricDaoRedisTSImpl implements MetricDao {
-    static private final Integer RETENTION_MS =
+
+    private static final Integer RETENTION_MS =
             60 * 60 * 24 * 14 * 1000;
     private final RedisTimeSeries rts;
 

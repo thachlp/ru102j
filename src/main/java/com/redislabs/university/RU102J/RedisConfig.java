@@ -6,9 +6,9 @@ public class RedisConfig {
     public static final String DEFAULT_HOST = "localhost";
     public static final Integer DEFAULT_PORT = 6379;
     public static final String DEFAULT_PASSWORD = "";
-    public String host;
-    public Integer port;
-    public String password;
+    private String host;
+    private Integer port;
+    private String password;
 
     @JsonProperty
     public String getHost() {

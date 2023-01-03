@@ -1,5 +1,6 @@
 package com.redislabs.university.RU102J.resources;
 
+import com.google.common.net.HttpHeaders;
 import com.redislabs.university.RU102J.api.Coordinate;
 import com.redislabs.university.RU102J.api.GeoQuery;
 import com.redislabs.university.RU102J.api.Site;
@@ -31,18 +32,18 @@ public class SiteGeoResource {
                                          Boolean onlyExcessCapacity) {
         if (lng == null && lat == null) {
             return Response.ok(siteDao.findAll())
-                    .header("Access-Control-Allow-Origin", "*")
+                    .header("", "*")
                     .build();
         } else if (lng != null && lat != null) {
             Set<Site> results = doGeoQuery(lng, lat, radius, radiusUnit,
                     onlyExcessCapacity);
             return Response.ok(results)
-                    .header("Access-Control-Allow-Origin", "*")
+                    .header(HttpHeaders.ACCESS_CONTROL_ALLOW_ORIGIN, "*")
                     .build();
         }
         return Response.noContent()
                 .status(404)
-                .header("Access-Control-Allow-Origin", "*")
+                .header(HttpHeaders.ACCESS_CONTROL_ALLOW_ORIGIN, "*")
                 .build();
     }
 
@@ -73,6 +74,6 @@ public class SiteGeoResource {
         if (site == null) {
             return Response.noContent().status(404).build();
         }
-        return Response.ok(site).header("Access-Control-Allow-Origin", "*").build();
+        return Response.ok(site).header(HttpHeaders.ACCESS_CONTROL_ALLOW_ORIGIN, "*").build();
     }
 }

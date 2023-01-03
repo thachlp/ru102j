@@ -2,7 +2,7 @@ package com.redislabs.university.RU102J.core;
 
 public class KeyHelper {
 
-    private static final String defaultPrefix = "app";
+    private static final String DEFAULT_PREFIX = "app";
 
     private static String prefix = null;
 
@@ -18,7 +18,7 @@ public class KeyHelper {
         if (prefix != null) {
             return prefix;
         } else {
-            return defaultPrefix;
+            return DEFAULT_PREFIX;
         }
     }
 }

@@ -1,5 +1,6 @@
 package com.redislabs.university.RU102J.resources;
 
+import com.google.common.net.HttpHeaders;
 import com.redislabs.university.RU102J.api.Measurement;
 import com.redislabs.university.RU102J.api.Plot;
 import com.redislabs.university.RU102J.api.MetricUnit;
@@ -45,7 +46,7 @@ public class MetricsResource {
         plots.add(new Plot("Watt-Hours Used", used));
 
         return Response.ok(plots)
-                .header("Access-Control-Allow-Origin", "*")
+                .header(HttpHeaders.ACCESS_CONTROL_ALLOW_ORIGIN, "*")
                 .build();
     }
 }

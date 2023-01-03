@@ -9,7 +9,7 @@ import java.util.Set;
 // a method for cleaning up these keys.
 public class TestKeyManager {
 
-    private String prefix;
+    private final String prefix;
 
     public TestKeyManager(String prefix) {
         KeyHelper.setPrefix(prefix);

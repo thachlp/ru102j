@@ -14,7 +14,7 @@ import java.util.List;
 public class FeedResource {
 
     private final FeedDao feedDao;
-    private static final Integer defaultLimit = 20;
+    private static final Integer FEED_DEFAULT_LIMIT = 20;
 
     public FeedResource(FeedDao feedDao) {
         this.feedDao = feedDao;
@@ -23,7 +23,7 @@ public class FeedResource {
     @GET
     public Response getAllEntries(@QueryParam("limit") Integer limit) {
         if (limit == null) {
-            limit = defaultLimit;
+            limit = FEED_DEFAULT_LIMIT;
         }
         List<MeterReading> readings = feedDao.getRecentGlobal(limit);
         return Response.ok(readings)
@@ -35,7 +35,7 @@ public class FeedResource {
     public Response getSingleFeed(@PathParam("id") Long siteId,
                                             @QueryParam("limit") Integer limit) {
         if (limit == null) {
-            limit = defaultLimit;
+            limit = FEED_DEFAULT_LIMIT;
         }
         List<MeterReading> readings = feedDao.getRecentForSite(siteId, limit);
         return Response.ok(readings)

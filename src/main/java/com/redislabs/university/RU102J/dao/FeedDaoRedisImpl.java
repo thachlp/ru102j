@@ -1,20 +1,16 @@
 package com.redislabs.university.RU102J.dao;
 
 import com.redislabs.university.RU102J.api.MeterReading;
-import java.util.HashMap;
-import java.util.Map;
 import redis.clients.jedis.*;
 
-import java.nio.channels.Pipe;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class FeedDaoRedisImpl implements FeedDao {
 
     private final JedisPool jedisPool;
-    private static final long globalMaxFeedLength = 10000;
-    private static final long siteMaxFeedLength = 2440;
+    private static final long GLOBAL_MAX_FEED_LENGTH = 10000;
+    private static final long SITE_MAX_FEED_LENGTH = 2440;
 
     public FeedDaoRedisImpl(JedisPool jedisPool) {
         this.jedisPool = jedisPool;
@@ -32,12 +28,12 @@ public class FeedDaoRedisImpl implements FeedDao {
             pipeline.xadd(globalFeedKey,
                 StreamEntryID.NEW_ENTRY,
                 meterReading.toMap(),
-                siteMaxFeedLength,
+                GLOBAL_MAX_FEED_LENGTH,
                 true);
             pipeline.xadd(siteFeedKey,
                 StreamEntryID.NEW_ENTRY,
                 meterReading.toMap(),
-                siteMaxFeedLength,
+                SITE_MAX_FEED_LENGTH,
                 true);
             pipeline.sync();
         }

@@ -8,6 +8,9 @@ public class JedisPoolDemo {
         final JedisPoolConfig poolConfig = new JedisPoolConfig();
         poolConfig.setMaxTotal(64);
         poolConfig.setMaxIdle(64);
-        JedisPool jedisPool = new JedisPool(poolConfig, "redis.enterprise", 6379);
+        try(JedisPool jedisPool = new JedisPool(poolConfig, "redis.enterprise", 6379)) {
+            System.out.println(jedisPool.getNumIdle());
+        }
+
     }
 }

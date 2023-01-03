@@ -11,11 +11,11 @@ import java.util.Objects;
  * calls that may request a series of points for a chart.
  */
 public class Measurement {
-    public Long siteId;
+    private Long siteId;
     @JsonFormat(shape = JsonFormat.Shape.NUMBER)
-    public ZonedDateTime dateTime;
-    public Double value;
-    public MetricUnit metricUnit;
+    private ZonedDateTime dateTime;
+    private Double value;
+    private MetricUnit metricUnit;
 
     public Measurement() {}
 

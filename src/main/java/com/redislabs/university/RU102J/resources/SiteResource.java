@@ -1,5 +1,6 @@
 package com.redislabs.university.RU102J.resources;
 
+import com.google.common.net.HttpHeaders;
 import com.redislabs.university.RU102J.api.Site;
 import com.redislabs.university.RU102J.dao.SiteDao;
 
@@ -21,7 +22,7 @@ public class SiteResource {
     @GET
     public Response getSites() {
         return Response.ok(siteDao.findAll())
-                .header("Access-Control-Allow-Origin", "*")
+                .header(HttpHeaders.ACCESS_CONTROL_ALLOW_ORIGIN, "*")
                 .build();
     }
 
@@ -32,6 +33,6 @@ public class SiteResource {
         if (site == null) {
             return Response.noContent().status(404).build();
         }
-        return Response.ok(site).header("Access-Control-Allow-Origin", "*").build();
+        return Response.ok(site).header(HttpHeaders.ACCESS_CONTROL_ALLOW_ORIGIN, "*").build();
     }
 }

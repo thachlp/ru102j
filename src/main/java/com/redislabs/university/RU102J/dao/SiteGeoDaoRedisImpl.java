@@ -9,8 +9,8 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class SiteGeoDaoRedisImpl implements SiteGeoDao {
-    private JedisPool jedisPool;
-    private static final Double capacityThreshold = 0.2;
+    private final JedisPool jedisPool;
+    private static final Double CAPACITY_THRESHOLD = 0.2;
 
     public SiteGeoDaoRedisImpl(JedisPool jedisPool) {
         this.jedisPool = jedisPool;
@@ -96,7 +96,7 @@ public class SiteGeoDaoRedisImpl implements SiteGeoDao {
              // END Challenge #5
 
              for (Site site : sites) {
-                 if (scores.get(site.getId()).get() >= capacityThreshold) {
+                 if (scores.get(site.getId()).get() >= CAPACITY_THRESHOLD) {
                      results.add(site);
                  }
              }

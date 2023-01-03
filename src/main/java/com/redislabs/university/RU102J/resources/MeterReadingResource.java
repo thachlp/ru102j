@@ -1,5 +1,6 @@
 package com.redislabs.university.RU102J.resources;
 
+import com.google.common.net.HttpHeaders;
 import com.redislabs.university.RU102J.api.MeterReading;
 import com.redislabs.university.RU102J.dao.*;
 
@@ -50,7 +51,7 @@ public class MeterReadingResource {
     public Response getGlobal(@PathParam("n") Integer count) {
         List<MeterReading> readings = feedDao.getRecentGlobal(getFeedCount(count));
         return Response.ok(readings)
-                .header("Access-Control-Allow-Origin", "*")
+                .header(HttpHeaders.ACCESS_CONTROL_ALLOW_ORIGIN, "*")
                 .build();
     }
 
@@ -61,7 +62,7 @@ public class MeterReadingResource {
         List<MeterReading> readings =
                 feedDao.getRecentForSite(id, getFeedCount(count));
         return Response.ok(readings)
-                .header("Access-Control-Allow-Origin", "*")
+                .header(HttpHeaders.ACCESS_CONTROL_ALLOW_ORIGIN, "*")
                 .build();
     }
 

@@ -5,7 +5,6 @@ import com.redislabs.university.RU102J.api.SiteStats;
 import com.redislabs.university.RU102J.script.CompareAndUpdateScript;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
-import redis.clients.jedis.Response;
 import redis.clients.jedis.Transaction;
 
 import java.time.ZoneOffset;
@@ -56,25 +55,25 @@ public class SiteStatsDaoRedisImpl implements SiteStatsDao {
     // potential race conditions and makes several round trips to Redis.
     private void updateBasic(Jedis jedis, String key, MeterReading reading) {
         String reportingTime = ZonedDateTime.now(ZoneOffset.UTC).toString();
-        jedis.hset(key, SiteStats.reportingTimeField, reportingTime);
-        jedis.hincrBy(key, SiteStats.countField, 1);
+        jedis.hset(key, SiteStats.REPORTING_TIME_FIELD, reportingTime);
+        jedis.hincrBy(key, SiteStats.COUNT_FIELD, 1);
         jedis.expire(key, weekSeconds);
 
-        String maxWh = jedis.hget(key, SiteStats.maxWhField);
+        String maxWh = jedis.hget(key, SiteStats.MAX_WH_FIELD);
         if (maxWh == null || reading.getWhGenerated() > Double.parseDouble(maxWh)) {
-            jedis.hset(key, SiteStats.maxWhField,
+            jedis.hset(key, SiteStats.MAX_WH_FIELD,
                     String.valueOf(reading.getWhGenerated()));
         }
 
-        String minWh = jedis.hget(key, SiteStats.minWhField);
+        String minWh = jedis.hget(key, SiteStats.MIN_WH_FIELD);
         if (minWh == null || reading.getWhGenerated() < Double.parseDouble(minWh)) {
-            jedis.hset(key, SiteStats.minWhField,
+            jedis.hset(key, SiteStats.MIN_WH_FIELD,
                     String.valueOf(reading.getWhGenerated()));
         }
 
-        String maxCapacity = jedis.hget(key, SiteStats.maxCapacityField);
+        String maxCapacity = jedis.hget(key, SiteStats.MAX_CAPACITY_FIELD);
         if (maxCapacity == null || getCurrentCapacity(reading) > Double.parseDouble(maxCapacity)) {
-            jedis.hset(key, SiteStats.maxCapacityField,
+            jedis.hset(key, SiteStats.MAX_CAPACITY_FIELD,
                     String.valueOf(getCurrentCapacity(reading)));
         }
     }
@@ -83,12 +82,12 @@ public class SiteStatsDaoRedisImpl implements SiteStatsDao {
     private void updateOptimized(Jedis jedis, String key, MeterReading reading) {
         try (Transaction trans = jedis.multi()) {
             String reportingTime = ZonedDateTime.now(ZoneOffset.UTC).toString();
-            trans.hset(key, SiteStats.reportingTimeField, reportingTime);
-            trans.hincrBy(key, SiteStats.countField, 1);
+            trans.hset(key, SiteStats.REPORTING_TIME_FIELD, reportingTime);
+            trans.hincrBy(key, SiteStats.COUNT_FIELD, 1);
             trans.expire(key, weekSeconds);
-            this.compareAndUpdateScript.updateIfGreater(trans, key, SiteStats.maxWhField, reading.getWhGenerated());
-            this.compareAndUpdateScript.updateIfLess(trans, key, SiteStats.minWhField, reading.getWhGenerated());
-            this.compareAndUpdateScript.updateIfGreater(trans, key, SiteStats.maxCapacityField, getCurrentCapacity(reading));
+            this.compareAndUpdateScript.updateIfGreater(trans, key, SiteStats.MAX_WH_FIELD, reading.getWhGenerated());
+            this.compareAndUpdateScript.updateIfLess(trans, key, SiteStats.MIN_WH_FIELD, reading.getWhGenerated());
+            this.compareAndUpdateScript.updateIfGreater(trans, key, SiteStats.MAX_CAPACITY_FIELD, getCurrentCapacity(reading));
             trans.exec();
         }
     }

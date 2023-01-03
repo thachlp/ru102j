@@ -10,8 +10,8 @@ import java.util.Objects;
  * A simple coordinate class storing latitude and longitude.
  */
 public class Coordinate {
-    public Double lng;
-    public Double lat;
+    private Double lng;
+    private Double lat;
 
     public Coordinate() {}
 

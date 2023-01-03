@@ -6,26 +6,26 @@ import java.util.Objects;
 
 // Site summary stats for a single day.
 public class SiteStats {
-    private ZonedDateTime lastReportingTime;
-    private Long meterReadingCount;
-    private Double maxWhGenerated;
-    private Double minWhGenerated;
-    private Double maxCapacity;
+    private final ZonedDateTime lastReportingTime;
+    private final Long meterReadingCount;
+    private final Double maxWhGenerated;
+    private final Double minWhGenerated;
+    private final Double maxCapacity;
 
     /* These field names will be used by multiple classes, so we define
        them here to abide by DRY (don't repeat yourself). */
-    public static final String reportingTimeField = "lastReportingTime";
-    public static final String countField = "meterReadingCount";
-    public static final String maxWhField = "maxWhGenerated";
-    public static final String minWhField = "minWhGenerated";
-    public static final String maxCapacityField = "maxCapacity";
+    public static final String REPORTING_TIME_FIELD = "lastReportingTime";
+    public static final String COUNT_FIELD = "meterReadingCount";
+    public static final String MAX_WH_FIELD = "maxWhGenerated";
+    public static final String MIN_WH_FIELD = "minWhGenerated";
+    public static final String MAX_CAPACITY_FIELD = "maxCapacity";
 
     public SiteStats(Map<String, String> map) {
-        this.lastReportingTime = parseTime(map.get(reportingTimeField));
-        this.meterReadingCount = parseLong(map.get(countField));
-        this.maxWhGenerated = parseDouble(map.get(maxWhField));
-        this.minWhGenerated = parseDouble(map.get(minWhField));
-        this.maxCapacity = parseDouble(map.get(maxCapacityField));
+        this.lastReportingTime = parseTime(map.get(REPORTING_TIME_FIELD));
+        this.meterReadingCount = parseLong(map.get(COUNT_FIELD));
+        this.maxWhGenerated = parseDouble(map.get(MAX_WH_FIELD));
+        this.minWhGenerated = parseDouble(map.get(MIN_WH_FIELD));
+        this.maxCapacity = parseDouble(map.get(MAX_CAPACITY_FIELD));
     }
 
     private Double parseDouble(String value) {

@@ -8,7 +8,7 @@ import java.util.List;
 public class UpdateIfLowestScript {
     private final Jedis jedis;
     private final String sha;
-    private final static String script =
+    private static final String SCRIPT =
             "local key = KEYS[1] " +
             "local new = ARGV[1] " +
             "local current = redis.call('GET', key) " +
@@ -23,7 +23,7 @@ public class UpdateIfLowestScript {
     // Load the script and cache the sha of the script.
     public UpdateIfLowestScript(Jedis jedis) {
         this.jedis = jedis;
-        this.sha = jedis.scriptLoad(script);
+        this.sha = jedis.scriptLoad(SCRIPT);
     }
 
     public boolean updateIfLowest(String key, Integer newValue) {

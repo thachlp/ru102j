@@ -3,8 +3,8 @@ package com.redislabs.university.RU102J.api;
 import java.util.List;
 
 public class CapacityReport {
-    private List<SiteCapacityTuple> highestCapacity;
-    private List<SiteCapacityTuple> lowestCapacity;
+    private final List<SiteCapacityTuple> highestCapacity;
+    private final List<SiteCapacityTuple> lowestCapacity;
 
     public CapacityReport(List<SiteCapacityTuple> highest, List<SiteCapacityTuple> lowest) {
         this.highestCapacity = highest;
