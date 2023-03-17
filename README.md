@@ -15,7 +15,7 @@ Prerequisites
 In order to start and run this application, you will need:
 
 * Java 8 JDK or higher
-* [Maven](https://maven.apache.org/)
+* [Maven](https://maven.apache.org/)/[Gradle](https://gradle.org/)
 * Access to a local or remote installation of [Redis](https://redis.io/download) version 5 or newer (local preferred, Docker is a good option - see instructions below)
 * If you want to try the RedisTimeSeries exercises, you'll need to make sure that your Redis installation also has the [RedisTimeSeries Module](https://oss.redis.com/redistimeseries/) installed (or use the provided Docker Compose file which gives you Redis with RedisTimeSeries)
 * Optional: [Docker](https://www.docker.com/get-started/)
@@ -69,18 +69,19 @@ How to Start the RediSolar Application
 
 ### When using Redis on localhost, port 6379 with no password:
 
-1. Run `mvn package` to build your application.
-2. Load the sample data: `java -jar target/redisolar-1.0.jar load`.  If you want to erase everything in Redis before loading the data, use `java -jar target/redisolar-1.0.jar load --flush true`, but be aware that this will delete ALL keys in your Redis database.  Note that loading the data may take a few minutes.
-3. Start the application with `java -jar target/redisolar-1.0.jar server config.yml`
+1. Run `mvn package` or `gradle build` to build your application, `jar` file will store in `/target/` with maven or `/build/libs/` with gradle
+2. Load the sample data: `java -jar <path>/redisolar-0.0.1.jar load` or `gradle run --args="load"` \
+If you want to erase everything in Redis before loading the data, use `java -jar <path>/redisolar-0.0.1.jar load --flush true`, but be aware that this will delete ALL keys in your Redis database.  Note that loading the data may take a few minutes.
+3. Start the application with `java -jar <path>/redisolar-0.0.1.jar server config.yml` or `gradle run --args="server config.yml" `
 4. To check that your application is running enter url `http://localhost:8081`, substituting `localhost` for the hostname that you're running the application on if necessary.
 
 ### When using Redis on another host, port or with a password:
 
 1. Edit `config.yml`, setting the values for your Redis host, port and password if needed.
 2. Edit `src/test/java/com/redislabs/university/RU102J/HostPort.java`, setting the values for your Redis host, port, and password if needed.
-3. Run `mvn package` to build your application.
-4. Load the sample data with `java -jar target/redisolar-1.0.jar load --host <hostname> --port <port> --password <password>`.
-5. Start application with `java -jar target/redisolar-1.0.jar server config.yml`.
+3. Run `mvn package` or `gradle build` to build your application.
+4. Load the sample data with `java -jar <path>/redisolar-0.0.1.jar load --host <hostname> --port <port> --password <password>`.
+5. Start application with `java -jar <path>/redisolar-0.0.1.jar server config.yml`.
 6. To check that your application is running enter url `http://localhost:8081`, substituting `localhost` for the hostname that you're running the application on if necessary.
 
 Tests
@@ -89,13 +90,13 @@ Tests
 To run all tests:
 
 ```
-mvn test
+mvn test / gradle build
 ```
 
 To run a specific test:
 
 ```
-mvn test -Dtest=JedisBasicsTest
+mvn test -Dtest=JedisBasicsTest / gradle test --tests JedisBasicsTest
 ```
 
 Building
@@ -104,13 +105,13 @@ Building
 To rebuild the application:
 
 ```
-mvn package
+mvn package / gradle build
 ```
 
 To rebuild the application without running the tests:
 
 ```
-mvn package -DskipTests 
+mvn package -DskipTests / gradle build -x test
 ```
 
 Need Help / Join our Community
