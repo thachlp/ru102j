@@ -16,7 +16,7 @@
   "dependencies": {
     "axios": "^0.27.2",
     "chart.js": "^2.9.4",
-    "leaflet": "^1.4.0",
+    "leaflet": "^1.9.4",
     "vue-router": "^3.6.5",
     "vue": "^2.7.14",
     "vue2-leaflet": "^1.2.3"
