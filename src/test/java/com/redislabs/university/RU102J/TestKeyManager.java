@@ -17,7 +17,7 @@ public class TestKeyManager {
     }
 
     public void deleteKeys(Jedis jedis) {
-        Set<String> keysToDelete = jedis.keys(getKeyPattern());
+        final Set<String> keysToDelete = jedis.keys(getKeyPattern());
         for (String key : keysToDelete) {
            jedis.del(key);
         }
