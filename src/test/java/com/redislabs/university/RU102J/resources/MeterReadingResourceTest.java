@@ -42,12 +42,12 @@ public class MeterReadingResourceTest {
 
     @Test
     public void testInsertMeterReading() {
-        List<MeterReading> readings = new ArrayList<>();
-        MeterReading r1 = generateMeterReading(1);
-        MeterReading r2 = generateMeterReading(2);
+        final List<MeterReading> readings = new ArrayList<>();
+        final MeterReading r1 = generateMeterReading(1);
+        final MeterReading r2 = generateMeterReading(2);
         readings.add(r1);
         readings.add(r2);
-        Entity<List<MeterReading>> entity = Entity.json(readings);
+        final Entity<List<MeterReading>> entity = Entity.json(readings);
         resources.target("/meterReadings").request().post(entity);
         verify(metricDao).insert(r1);
         verify(metricDao).insert(r2);
@@ -59,10 +59,10 @@ public class MeterReadingResourceTest {
         verify(feedDao).insert(r2);
     }
 
-    private MeterReading generateMeterReading(long siteId) {
-        ZonedDateTime now = ZonedDateTime.now().
+    private static MeterReading generateMeterReading(long siteId) {
+        final ZonedDateTime now = ZonedDateTime.now().
                 withZoneSameInstant(ZoneId.of("UTC"));
-        MeterReading reading = new MeterReading();
+        final MeterReading reading = new MeterReading();
         reading.setSiteId(siteId);
         reading.setDateTime(now);
         reading.setTempC(15.0);

@@ -1,9 +1,12 @@
 package com.redislabs.university.RU102J;
 
-public class HostPort {
-    private final static String defaultHost = "localhost";
-    private final static Integer defaultPort = 6379;
-    private final static String defaultPassword = "";
+public final class HostPort {
+    private static final String defaultHost = "localhost";
+    private static final Integer defaultPort = 6379;
+    private static final String defaultPassword = "";
+
+    private HostPort() {
+    }
 
     public static String getRedisHost() {
         return defaultHost;

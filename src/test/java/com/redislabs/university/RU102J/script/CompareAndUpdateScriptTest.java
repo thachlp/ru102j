@@ -25,17 +25,14 @@ public class CompareAndUpdateScriptTest {
 
     @BeforeClass
     public static void setUp() throws Exception {
-        String password = HostPort.getRedisPassword();
-        
+        final String password = HostPort.getRedisPassword();
         jedis = new Jedis(HostPort.getRedisHost(), HostPort.getRedisPort());
-
-        if (password.length() > 0) {
+        if (!password.isEmpty()) {
             jedisPool = new JedisPool(new JedisPoolConfig(), HostPort.getRedisHost(), HostPort.getRedisPort(), 2000, password);
             jedis.auth(password);
         } else {
             jedisPool = new JedisPool(HostPort.getRedisHost(), HostPort.getRedisPort());
         }
-
         keyManager = new TestKeyManager("test");
     }
 
@@ -52,17 +49,17 @@ public class CompareAndUpdateScriptTest {
 
     @Before
     public void prepare() {
-        this.cu = new CompareAndUpdateScript(jedisPool);
-        this.key = RedisSchema.getSiteStatsKey(1L, ZonedDateTime.now());
-        this.emptyKey = RedisSchema.getSiteStatsKey(1000L, ZonedDateTime.now());
-        this.field = "n";
+        cu = new CompareAndUpdateScript(jedisPool);
+        key = RedisSchema.getSiteStatsKey(1L, ZonedDateTime.now());
+        emptyKey = RedisSchema.getSiteStatsKey(1000L, ZonedDateTime.now());
+        field = "n";
         jedis.hset(key, field, "1.0");
     }
 
     @Test
     public void updateWhenNull() {
         jedis.del(emptyKey);
-        Transaction t1 = jedis.multi();
+        final Transaction t1 = jedis.multi();
         cu.updateIfGreater(t1, emptyKey, "n", 1.0);
         t1.exec();
         assertThat(jedis.hget(emptyKey, "n"), is("1.0"));
@@ -70,12 +67,12 @@ public class CompareAndUpdateScriptTest {
 
     @Test
     public void updateIfGreater() {
-        Transaction t1 = jedis.multi();
+        final Transaction t1 = jedis.multi();
         cu.updateIfGreater(t1, key, "n", 0.0);
         t1.exec();
         assertThat(jedis.hget(key, field), is("1.0"));
 
-        Transaction t2 = jedis.multi();
+        final Transaction t2 = jedis.multi();
         cu.updateIfGreater(t2, key, "n", 2.0);
         t2.exec();
         assertThat(jedis.hget(key, field), is("2.0"));
@@ -83,12 +80,12 @@ public class CompareAndUpdateScriptTest {
 
     @Test
     public void updateIfLess() {
-        Transaction t1 = jedis.multi();
+        final Transaction t1 = jedis.multi();
         cu.updateIfLess(t1, key, "n", 0.0);
         t1.exec();
         assertThat(jedis.hget(key, field), is("0.0"));
 
-        Transaction t2 = jedis.multi();
+        final Transaction t2 = jedis.multi();
         cu.updateIfLess(t2, key, "n", 2.0);
         t2.exec();
         assertThat(jedis.hget(key, field), is("0.0"));

@@ -10,15 +10,13 @@ import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.*;
 
 public class UpdateIfLowestScriptTest {
-
     private Jedis jedis;
 
     @Before
     public void setUp() {
-        this.jedis = new Jedis(HostPort.getRedisHost(), HostPort.getRedisPort());
-
-        if (HostPort.getRedisPassword().length() > 0) {
-            this.jedis.auth(HostPort.getRedisPassword());
+        jedis = new Jedis(HostPort.getRedisHost(), HostPort.getRedisPort());
+        if (!HostPort.getRedisPassword().isEmpty()) {
+            jedis.auth(HostPort.getRedisPassword());
         }
     }
 
@@ -31,30 +29,30 @@ public class UpdateIfLowestScriptTest {
     @Test
     public void updateIfLowest() {
         jedis.set("testLua", "100");
-        UpdateIfLowestScript script = new UpdateIfLowestScript(jedis);
+        final UpdateIfLowestScript script = new UpdateIfLowestScript(jedis);
 
-        boolean result = script.updateIfLowest("testLua", 50);
-        assertThat(result, is(true));
-        assertThat(jedis.get("testLua"), is("50"));
+        final boolean result = script.updateIfLowest("testLua", 50);
+        assertTrue(result);
+        assertEquals("50", jedis.get("testLua"));
     }
 
     @Test
     public void updateIfLowestUnchanged() {
         jedis.set("testLua", "100");
-        UpdateIfLowestScript script = new UpdateIfLowestScript(jedis);
+        final UpdateIfLowestScript script = new UpdateIfLowestScript(jedis);
 
-        boolean result = script.updateIfLowest("testLua", 200);
-        assertThat(result, is(false));
-        assertThat(jedis.get("testLua"), is("100"));
+        final boolean result = script.updateIfLowest("testLua", 200);
+        assertFalse(result);
+        assertEquals("100", jedis.get("testLua"));
     }
 
     @Test
     public void updateIfLowestWithNoKey() {
         jedis.del("testLua");
-        UpdateIfLowestScript script = new UpdateIfLowestScript(jedis);
+        final UpdateIfLowestScript script = new UpdateIfLowestScript(jedis);
 
-        boolean result = script.updateIfLowest("testLua", 200);
-        assertThat(result, is(true));
-        assertThat(jedis.get("testLua"), is("200"));
+        final boolean result = script.updateIfLowest("testLua", 200);
+        assertTrue(result);
+        assertEquals("200", jedis.get("testLua"));
     }
 }
