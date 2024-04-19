@@ -27,30 +27,28 @@ import static org.hamcrest.CoreMatchers.is;
 public class MetricDaoRedisTSImplTest {
 
     private ArrayList<MeterReading> readings;
-    private Long siteId = 1L;
-    private ZonedDateTime startingDate = ZonedDateTime.now(ZoneOffset.UTC);
+    private final Long siteId = 1L;
+    private final ZonedDateTime startingDate = ZonedDateTime.now(ZoneOffset.UTC);
     private TestKeyManager keyManager;
     private RedisTimeSeries rts;
     private JedisPool jedisPool;
 
     @Before
     public void setUp() {
-        String password = HostPort.getRedisPassword();
-
-        if (password.length() > 0) {
+        final String password = HostPort.getRedisPassword();
+        if (!password.isEmpty()) {
             jedisPool = new JedisPool(new JedisPoolConfig(), HostPort.getRedisHost(), HostPort.getRedisPort(), 2000, password);
         } else {
             jedisPool = new JedisPool(HostPort.getRedisHost(), HostPort.getRedisPort());
         }
-
         keyManager = new TestKeyManager("test");
     }
 
     @After
     public void tearDown() {
-        String gKey = RedisSchema.getTSKey(siteId, MetricUnit.WHGenerated);
-        String uKey = RedisSchema.getTSKey(siteId, MetricUnit.WHUsed);
-        String tKey = RedisSchema.getTSKey(siteId, MetricUnit.TemperatureCelsius);
+        final String gKey = RedisSchema.getTSKey(siteId, MetricUnit.WH_GENERATED);
+        final String uKey = RedisSchema.getTSKey(siteId, MetricUnit.WH_USED);
+        final String tKey = RedisSchema.getTSKey(siteId, MetricUnit.TEMPERATURE_CELSIUS);
         try (Jedis jedis = jedisPool.getResource()) {
             jedis.del(gKey);
             jedis.del(uKey);
@@ -67,7 +65,7 @@ public class MetricDaoRedisTSImplTest {
         readings = new ArrayList<>();
         ZonedDateTime time = startingDate;
         for (int i=0; i <  72 * 60; i++) {
-            MeterReading reading = new MeterReading();
+            final MeterReading reading = new MeterReading();
             reading.setSiteId(siteId);
             reading.setTempC(i * 1.0);
             reading.setWhUsed(i * 1.0);
@@ -96,12 +94,12 @@ public class MetricDaoRedisTSImplTest {
     }
 
     private void testInsertAndRetrieve(int limit) {
-        MetricDao metricDao = new MetricDaoRedisTSImpl(jedisPool);
+        final MetricDao metricDao = new MetricDaoRedisTSImpl(jedisPool);
         for (MeterReading reading : readings) {
             metricDao.insert(reading);
         }
 
-        List<Measurement> measurements = metricDao.getRecent(siteId, MetricUnit.WHGenerated,
+        final List<Measurement> measurements = metricDao.getRecent(siteId, MetricUnit.WH_GENERATED,
          startingDate, limit);
         assertThat(measurements.size(), is(limit));
     }

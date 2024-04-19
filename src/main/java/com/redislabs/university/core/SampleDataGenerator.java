@@ -28,7 +28,7 @@ public class SampleDataGenerator {
 
     public SampleDataGenerator(JedisPool jedisPool) {
         this.jedisPool = jedisPool;
-        this.random = new Random(SEED);
+        random = new Random(SEED);
     }
 
     /* Generate historical data for all sites starting from the
@@ -42,32 +42,32 @@ public class SampleDataGenerator {
                     " for historical request.");
         }
 
-        SiteStatsDao siteStatsDao = new SiteStatsDaoRedisImpl(jedisPool);
-        CapacityDao capacityDao = new CapacityDaoRedisImpl(jedisPool);
-        MetricDao metricDao = new MetricDaoRedisZSetImpl(jedisPool);
-        FeedDao feedDao = new FeedDaoRedisImpl(jedisPool);
-        MeterReadingResource meterResource = new MeterReadingResource(siteStatsDao, metricDao,
+        final SiteStatsDao siteStatsDao = new SiteStatsDaoRedisImpl(jedisPool);
+        final CapacityDao capacityDao = new CapacityDaoRedisImpl(jedisPool);
+        final MetricDao metricDao = new MetricDaoRedisZSetImpl(jedisPool);
+        final FeedDao feedDao = new FeedDaoRedisImpl(jedisPool);
+        final MeterReadingResource meterResource = new MeterReadingResource(siteStatsDao, metricDao,
                 capacityDao, feedDao);
 
-        Set<Site> sites = getAllSites();
-        int minuteDays = days * 3 * 60;
+        final Set<Site> sites = getAllSites();
+        final int minuteDays = days * 3 * 60;
 
-        List<Site> sortedSites =
+        final List<Site> sortedSites =
                 sites.stream().sorted().collect(Collectors.toList());
 
-        MeterReading[][] readings =
+        final MeterReading[][] readings =
                 new MeterReading[sortedSites.size()][minuteDays];
 
         // Generate minute-level metrics for energy generated and energy used.
         for (Site site : sortedSites) {
-            Double maxCapacity = getMaxMinuteWHGenerated(site.getCapacity());
+            final Double maxCapacity = getMaxMinuteWHGenerated(site.getCapacity());
             Double currentCapacity = getNextValue(maxCapacity);
             Double currentTemperature = getNextValue(MAX_TEMPERATURE_C);
             Double currentUsage = getInitialMinuteWHUsed(maxCapacity);
             ZonedDateTime currentTime = ZonedDateTime.now(ZoneOffset.UTC).minusMinutes(minuteDays);
 
             for (int i=0; i<minuteDays; i++) {
-                MeterReading reading = new MeterReading(site.getId(), currentTime, currentUsage,
+                final MeterReading reading = new MeterReading(site.getId(), currentTime, currentUsage,
                         currentCapacity, currentTemperature);
 
                 readings[site.getId().intValue()-1][i] = reading;
@@ -82,7 +82,7 @@ public class SampleDataGenerator {
         }
 
         for (int i=0; i<minuteDays; i++) {
-            System.out.print(".");
+            System.out.print('.');
             for (int j=0; j<sortedSites.size(); j++) {
                 meterResource.add(readings[j][i]);
             }
@@ -91,10 +91,10 @@ public class SampleDataGenerator {
 
     public Set<Site> getAllSites() {
         try (Jedis jedis = jedisPool.getResource()) {
-            Set<String> keys = jedis.smembers(RedisSchema.getSiteIDsKey());
-            Set<Site> sites = new HashSet<>(keys.size());
+            final Set<String> keys = jedis.smembers(RedisSchema.getSiteIDsKey());
+            final Set<Site> sites = new HashSet<>(keys.size());
             for (String key : keys) {
-                Map<String, String> site = jedis.hgetAll(key);
+                final Map<String, String> site = jedis.hgetAll(key);
                 if (!site.isEmpty()) {
                     sites.add(new Site(site));
                 }
@@ -105,7 +105,7 @@ public class SampleDataGenerator {
 
     // Since site capacity is measured in kWh per day, we need to get a
     // minute-based maximum watt-hours to work with.
-    private Double getMaxMinuteWHGenerated(Double capacity) {
+    private static Double getMaxMinuteWHGenerated(Double capacity) {
         return capacity * 1000 / 24 / 60;
     }
 
@@ -115,7 +115,7 @@ public class SampleDataGenerator {
 
     // Returns the next value in the series
     private Double getNextValue(Double current, Double max) {
-        Double stepSize = 0.1 * max;
+        final Double stepSize = 0.1 * max;
         if (random.nextBoolean()) {
             return current + stepSize;
         } else {
@@ -125,7 +125,7 @@ public class SampleDataGenerator {
 
     // Returns an initial kWhUsed value with a .5 chance of being
     // above the max solar generating capacity.
-    private Double getInitialMinuteWHUsed(Double maxCapacity) {
+    private static Double getInitialMinuteWHUsed(Double maxCapacity) {
         if (Math.random() > 0.5) {
             return maxCapacity + 0.1;
         } else {

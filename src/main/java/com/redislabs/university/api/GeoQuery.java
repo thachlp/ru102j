@@ -21,7 +21,7 @@ public class GeoQuery {
         this.coordinate = coordinate;
         this.radius = radius;
         this.radiusUnit = GeoUnit.valueOf(radiusUnit);
-        this.onlyExcessCapacity = false;
+        onlyExcessCapacity = false;
     }
 
     public GeoQuery(Coordinate coordinate, Double radius, String radiusUnit,
@@ -37,7 +37,7 @@ public class GeoQuery {
         this.coordinate = coordinate;
         this.radius = radius;
         this.radiusUnit = radiusUnit;
-        this.onlyExcessCapacity = false;
+        onlyExcessCapacity = false;
     }
 
     public GeoQuery(Coordinate coordinate, Double radius, GeoUnit radiusUnit,
@@ -66,9 +66,13 @@ public class GeoQuery {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        GeoQuery geoQuery = (GeoQuery) o;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        final GeoQuery geoQuery = (GeoQuery) o;
         return onlyExcessCapacity == geoQuery.onlyExcessCapacity &&
                 Objects.equals(coordinate, geoQuery.coordinate) &&
                 Objects.equals(radius, geoQuery.radius) &&

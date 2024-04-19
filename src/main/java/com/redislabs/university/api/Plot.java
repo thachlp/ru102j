@@ -39,9 +39,13 @@ public class Plot {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Plot plot = (Plot) o;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        final Plot plot = (Plot) o;
         return Objects.equals(measurements, plot.measurements) &&
                 Objects.equals(name, plot.name);
     }

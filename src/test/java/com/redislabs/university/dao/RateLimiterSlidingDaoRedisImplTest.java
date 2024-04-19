@@ -3,12 +3,10 @@ package com.redislabs.university.dao;
 import com.redislabs.university.HostPort;
 import com.redislabs.university.TestKeyManager;
 import org.junit.*;
-import org.junit.rules.ExpectedException;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
 
-import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.*;
 
 public class RateLimiterSlidingDaoRedisImplTest {
@@ -17,17 +15,12 @@ public class RateLimiterSlidingDaoRedisImplTest {
     private static Jedis jedis;
     private static TestKeyManager keyManager;
 
-    @Rule
-    public ExpectedException thrown = ExpectedException.none();
-
     @BeforeClass
     public static void setUp() throws Exception {
-        String password = HostPort.getRedisPassword();
-
-        if (password.length() > 0) {
+        final String password = HostPort.getRedisPassword();
+        if (!password.isEmpty()) {
             jedisPool = new JedisPool(new JedisPoolConfig(), HostPort.getRedisHost(), HostPort.getRedisPort(), 2000, password);
             jedis = new Jedis(HostPort.getRedisHost(), HostPort.getRedisPort());
-
             jedis.auth(password);
         } else {
             jedisPool = new JedisPool(HostPort.getRedisHost(), HostPort.getRedisPort());
@@ -50,7 +43,7 @@ public class RateLimiterSlidingDaoRedisImplTest {
     @Test
     public void hit() {
         int exceptionCount = 0;
-        RateLimiter limiter = new RateLimiterSlidingDaoRedisImpl(jedisPool,
+        final RateLimiter limiter = new RateLimiterSlidingDaoRedisImpl(jedisPool,
                 100, 10);
         for (int i=0; i<10; i++) {
             try {
@@ -59,14 +52,13 @@ public class RateLimiterSlidingDaoRedisImplTest {
                 exceptionCount += 1;
             }
         }
-
-        assertThat(exceptionCount, is(0));
+        assertEquals(0, exceptionCount);
     }
 
     @Test
     public void hitOutsideLimit() {
         int exceptionCount = 0;
-        RateLimiter limiter = new RateLimiterSlidingDaoRedisImpl(jedisPool,
+        final RateLimiter limiter = new RateLimiterSlidingDaoRedisImpl(jedisPool,
                 100, 10);
         for (int i=0; i<12; i++) {
             try {
@@ -76,13 +68,13 @@ public class RateLimiterSlidingDaoRedisImplTest {
             }
         }
 
-        assertThat(exceptionCount, is(2));
+        assertEquals(2, exceptionCount);
     }
 
     @Test
     public void hitOutsideWindow() throws InterruptedException {
         int exceptionCount = 0;
-        RateLimiter limiter = new RateLimiterSlidingDaoRedisImpl(jedisPool,
+        final RateLimiter limiter = new RateLimiterSlidingDaoRedisImpl(jedisPool,
                 100, 10);
         for (int i=0; i<11; i++) {
             if (i == 10) {
@@ -95,7 +87,6 @@ public class RateLimiterSlidingDaoRedisImplTest {
                 exceptionCount += 1;
             }
         }
-
-        assertThat(exceptionCount, is(0));
+        assertEquals(0, exceptionCount);
     }
 }

@@ -20,7 +20,7 @@ public class RediSolarConfiguration extends Configuration {
 
     @JsonProperty("redis")
     public void setRedisConfig(RedisConfig config) {
-        this.redisConfig = config;
+        redisConfig = config;
     }
 
     @JsonProperty("redis")

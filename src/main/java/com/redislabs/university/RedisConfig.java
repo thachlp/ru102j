@@ -2,6 +2,8 @@ package com.redislabs.university;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import java.util.Objects;
+
 public class RedisConfig {
     public static final String DEFAULT_HOST = "localhost";
     public static final Integer DEFAULT_PORT = 6379;
@@ -12,11 +14,7 @@ public class RedisConfig {
 
     @JsonProperty
     public String getHost() {
-        if (host == null) {
-            return DEFAULT_HOST;
-        } else {
-            return host;
-        }
+        return Objects.requireNonNullElse(host, DEFAULT_HOST);
     }
 
     @JsonProperty
@@ -26,11 +24,7 @@ public class RedisConfig {
 
     @JsonProperty
     public Integer getPort() {
-        if (port == null) {
-            return DEFAULT_PORT;
-        } else {
-            return port;
-        }
+        return Objects.requireNonNullElse(port, DEFAULT_PORT);
     }
 
     @JsonProperty
@@ -40,11 +34,7 @@ public class RedisConfig {
 
     @JsonProperty
     public String getPassword() {
-        if (password == null) {
-            return DEFAULT_PASSWORD;
-        } else {
-            return password;
-        }
+        return Objects.requireNonNullElse(password, DEFAULT_PASSWORD);
     }
 
     @JsonProperty

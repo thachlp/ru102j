@@ -26,21 +26,21 @@ public class MeterReading {
     public MeterReading() {}
 
     public MeterReading(Map<String, String> map) {
-        this.siteId = Long.valueOf(map.get("siteId"));
-        this.dateTime = ZonedDateTime.parse(map.get("dateTime"));
-        this.whUsed = Double.valueOf(map.get("whUsed"));
-        this.whGenerated = Double.valueOf(map.get("whGenerated"));
-        this.tempC = Double.valueOf(map.get("tempC"));
+        siteId = Long.valueOf(map.get("siteId"));
+        dateTime = ZonedDateTime.parse(map.get("dateTime"));
+        whUsed = Double.valueOf(map.get("whUsed"));
+        whGenerated = Double.valueOf(map.get("whGenerated"));
+        tempC = Double.valueOf(map.get("tempC"));
     }
 
     @JsonCreator
     public MeterReading(@JsonProperty("siteId") Long siteId,
-                        @JsonProperty ("dateTime") ZonedDateTime date,
+                        @JsonProperty("dateTime") ZonedDateTime date,
                         @JsonProperty("whUsed") Double whUsed,
                         @JsonProperty("whGenerated") Double whGenerated,
                         @JsonProperty("tempC") Double tempC) {
         this.siteId = siteId;
-        this.dateTime = date;
+        dateTime = date;
         this.whUsed = whUsed;
         this.whGenerated = whGenerated;
         this.tempC = tempC;
@@ -97,7 +97,7 @@ public class MeterReading {
     }
 
     public Map<String, String> toMap() {
-        Map<String, String> map = new HashMap<>();
+        final Map<String, String> map = new HashMap<>();
 
         map.put("siteId", String.valueOf(siteId));
         map.put("dateTime", dateTime.toString());
@@ -110,9 +110,13 @@ public class MeterReading {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        MeterReading that = (MeterReading) o;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        final MeterReading that = (MeterReading) o;
         return Objects.equals(siteId, that.siteId) &&
                 Objects.equals(dateTime, that.dateTime) &&
                 Objects.equals(whUsed, that.whUsed) &&

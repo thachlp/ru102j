@@ -44,17 +44,17 @@ public class Site implements Comparable<Site> {
             throw new IllegalArgumentException("Map<String, String> used to build a Site must " +
                     "contain keys 'id', 'capacity', and 'panels'.");
         }
-        this.id = Long.valueOf(fields.getOrDefault("id", null));
-        this.capacity = Double.valueOf(fields.getOrDefault("capacity", null));
-        this.panels = Integer.valueOf(fields.getOrDefault("panels", null));
-        this.address = fields.getOrDefault("address", null);
-        this.city = fields.getOrDefault("city", null);
-        this.state = fields.getOrDefault("state", null);
-        this.postalCode = fields.getOrDefault("postalCode", null);
-        String lng = fields.getOrDefault("lng", null);
-        String lat = fields.getOrDefault("lat", null);
+        id = Long.valueOf(fields.getOrDefault("id", null));
+        capacity = Double.valueOf(fields.getOrDefault("capacity", null));
+        panels = Integer.valueOf(fields.getOrDefault("panels", null));
+        address = fields.getOrDefault("address", null);
+        city = fields.getOrDefault("city", null);
+        state = fields.getOrDefault("state", null);
+        postalCode = fields.getOrDefault("postalCode", null);
+        final String lng = fields.getOrDefault("lng", null);
+        final String lat = fields.getOrDefault("lat", null);
         if (lat != null && lng != null) {
-            this.coordinate = new Coordinate(fields.getOrDefault("lng", null),
+            coordinate = new Coordinate(fields.getOrDefault("lng", null),
                     fields.getOrDefault("lat", null));
         }
     }
@@ -141,7 +141,7 @@ public class Site implements Comparable<Site> {
 
     // Create a Map<String, String> from this Site.
     public Map<String, String> toMap() {
-        Map<String, String> map = new HashMap<>();
+        final Map<String, String> map = new HashMap<>();
         map.put("id", String.valueOf(id));
         map.put("capacity", String.valueOf(capacity));
         map.put("panels", String.valueOf(panels));
@@ -159,9 +159,13 @@ public class Site implements Comparable<Site> {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Site that = (Site) o;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        final Site that = (Site) o;
         return Objects.equals(id, that.id) &&
                 Objects.equals(capacity, that.capacity) &&
                 Objects.equals(panels, that.panels) &&

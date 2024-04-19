@@ -40,12 +40,12 @@ public class RediSolarApplication extends Application<RediSolarConfiguration> {
     @Override
     public void run(final RediSolarConfiguration configuration,
                     final Environment environment) {
-        RedisConfig redisConfig = configuration.getRedisConfig();
-        JedisPool jedisPool;
+        final RedisConfig redisConfig = configuration.getRedisConfig();
+        final JedisPool jedisPool;
         
-        String password = redisConfig.getPassword();
+        final String password = redisConfig.getPassword();
 
-        if (password.length() > 0) {
+        if (!password.isEmpty()) {
                 jedisPool = new JedisPool(new JedisPoolConfig(), redisConfig.getHost(),
                 redisConfig.getPort(), 2000, redisConfig.getPassword());
         } else {
@@ -58,21 +58,21 @@ public class RediSolarApplication extends Application<RediSolarConfiguration> {
 //        SiteResource siteResource =
 //                new SiteResource(new SiteDaoRedisImpl(jedisPool));
 //        environment.jersey().register(siteResource);
-        SiteGeoResource siteResource = new SiteGeoResource(new SiteGeoDaoRedisImpl(jedisPool));
+        final SiteGeoResource siteResource = new SiteGeoResource(new SiteGeoDaoRedisImpl(jedisPool));
         environment.jersey().register(siteResource);
 
         // For RedisTimeSeries: replace the next lines with
         // MetricsResource metricsResource =
         //              new MetricsResource(new MetricDaoRedisTSImpl(jedisPool));
-                MetricsResource metricsResource =
+                final MetricsResource metricsResource =
                         new MetricsResource(new MetricDaoRedisZSetImpl(jedisPool));
         environment.jersey().register(metricsResource);
 
-        CapacityResource capacityResource =
+        final CapacityResource capacityResource =
                 new CapacityResource(new CapacityDaoRedisImpl(jedisPool));
         environment.jersey().register(capacityResource);
 
-        MeterReadingResource meterResource =
+        final MeterReadingResource meterResource =
                 new MeterReadingResource(new SiteStatsDaoRedisImpl(jedisPool),
                         new MetricDaoRedisZSetImpl(jedisPool),
                         // For RedisTimeSeries: new MetricDaoRedisTSImpl(jedisPool),
@@ -80,7 +80,7 @@ public class RediSolarApplication extends Application<RediSolarConfiguration> {
                         new FeedDaoRedisImpl(jedisPool));
         environment.jersey().register(meterResource);
 
-        RediSolarHealthCheck healthCheck = new RediSolarHealthCheck(redisConfig);
+        final RediSolarHealthCheck healthCheck = new RediSolarHealthCheck(redisConfig);
         environment.healthChecks().register("healthy", healthCheck);
     }
 }

@@ -19,7 +19,6 @@ public class StreamsTest {
     private Map<String, String> entry1;
     private Map<String, String> entry2;
 
-
     @Before
     public void setUp() {
         jedis = new Jedis(HostPort.getRedisHost(), HostPort.getRedisPort());

@@ -7,8 +7,8 @@ public class CapacityReport {
     private final List<SiteCapacityTuple> lowestCapacity;
 
     public CapacityReport(List<SiteCapacityTuple> highest, List<SiteCapacityTuple> lowest) {
-        this.highestCapacity = highest;
-        this.lowestCapacity = lowest;
+        highestCapacity = highest;
+        lowestCapacity = lowest;
     }
 
     public List<SiteCapacityTuple> getHighestCapacity() {

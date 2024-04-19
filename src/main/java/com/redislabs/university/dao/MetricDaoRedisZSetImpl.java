@@ -14,7 +14,7 @@ import java.util.*;
 
 /**
  * Retain metrics using Redis sorted sets.
- *
+ * <p>
  * In this implementation, we use one sorted set per day for
  * up to 'MAX_METRIC_RETENTION_DAYS' days. Old sorted sets are expired
  * after this number of days.
@@ -37,22 +37,22 @@ public class MetricDaoRedisZSetImpl implements MetricDao {
     public void insert(MeterReading reading) {
         try (Jedis jedis = jedisPool.getResource()) {
             insertMetric(jedis, reading.getSiteId(), reading.getWhGenerated(),
-                    MetricUnit.WHGenerated, reading.getDateTime());
+                    MetricUnit.WH_GENERATED, reading.getDateTime());
             insertMetric(jedis, reading.getSiteId(), reading.getWhUsed(),
-                    MetricUnit.WHUsed, reading.getDateTime());
+                    MetricUnit.WH_USED, reading.getDateTime());
             insertMetric(jedis, reading.getSiteId(), reading.getTempC(),
-                    MetricUnit.TemperatureCelsius, reading.getDateTime());
+                    MetricUnit.TEMPERATURE_CELSIUS, reading.getDateTime());
         }
     }
 
     // Challenge #2
     private void insertMetric(Jedis jedis, long siteId, double value, MetricUnit unit,
                               ZonedDateTime dateTime) {
-        String metricKey = RedisSchema.getDayMetricKey(siteId, unit, dateTime);
-        Integer minuteOfDay = getMinuteOfDay(dateTime);
+        final String metricKey = RedisSchema.getDayMetricKey(siteId, unit, dateTime);
+        final Integer minuteOfDay = getMinuteOfDay(dateTime);
 
         jedis.zadd(metricKey, minuteOfDay, new MeasurementMinute(value, minuteOfDay).toString());
-        jedis.expire(metricKey, METRIC_EXPIRATION_SECONDS);
+        jedis.pexpire(metricKey, METRIC_EXPIRATION_SECONDS);
     }
 
     /**
@@ -69,7 +69,7 @@ public class MetricDaoRedisZSetImpl implements MetricDao {
                     "of minute-level data");
         }
 
-        List<Measurement> measurements = new ArrayList<>();
+        final List<Measurement> measurements = new ArrayList<>();
         ZonedDateTime currentDate = time;
         int count = limit;
         int iterations = 0;
@@ -77,7 +77,7 @@ public class MetricDaoRedisZSetImpl implements MetricDao {
         // This loop extracts the elements of successive
         // sorted sets until it reaches the requested limit.
         do {
-            List<Measurement> ms = getMeasurementsForDate(siteId, currentDate,
+            final List<Measurement> ms = getMeasurementsForDate(siteId, currentDate,
                     unit, count);
             measurements.addAll(0, ms);
             count -= ms.size();
@@ -97,26 +97,26 @@ public class MetricDaoRedisZSetImpl implements MetricDao {
                                                      MetricUnit unit,
                                                      Integer count) {
         // A list of Measurement objects to return.
-        List<Measurement> measurements = new ArrayList<>();
+        final List<Measurement> measurements = new ArrayList<>();
 
         try (Jedis jedis = jedisPool.getResource()) {
             // Get the metric key for the day implied by the date.
             // metric:[unit-name]:[year-month-day]:[site-id]
             // e.g.: metrics:whU:2020-01-01:1
-            String metricKey = RedisSchema.getDayMetricKey(siteId, unit, date);
+            final String metricKey = RedisSchema.getDayMetricKey(siteId, unit, date);
 
             // Return a reverse range so that we're always consuming from the end
             // of the sorted set.
-            Set<Tuple> metrics = jedis.zrevrangeWithScores(metricKey, 0, count - 1);
+            final Set<Tuple> metrics = jedis.zrevrangeWithScores(metricKey, 0, count - 1L);
             for (Tuple minuteValue : metrics) {
                 // Elements of the set are of the form [measurement]:[minute]
                 // The MeasurementMinute class abstracts this for us.
-                MeasurementMinute mm = MeasurementMinute.fromZSetValue(
+                final MeasurementMinute mm = MeasurementMinute.fromZSetValue(
                         minuteValue.getElement());
 
                 // Derive the dateTime for the measurement using the date and
                 // the minute of the day.
-                ZonedDateTime dateTime = getDateFromDayMinute(date,
+                final ZonedDateTime dateTime = getDateFromDayMinute(date,
                         mm.getMinuteOfDay());
 
                 // Add a new measurement to the list of measurements.
@@ -129,10 +129,10 @@ public class MetricDaoRedisZSetImpl implements MetricDao {
         return measurements;
     }
 
-    private ZonedDateTime getDateFromDayMinute(ZonedDateTime dateTime,
-                                               Integer dayMinute) {
-       int minute = dayMinute % 60;
-       int hour = dayMinute / 60;
+    private static ZonedDateTime getDateFromDayMinute(ZonedDateTime dateTime,
+                                                      Integer dayMinute) {
+       final int minute = dayMinute % 60;
+       final int hour = dayMinute / 60;
        return dateTime.withHour(hour).withMinute(minute).
                withZoneSameInstant(ZoneOffset.UTC);
     }
@@ -141,8 +141,8 @@ public class MetricDaoRedisZSetImpl implements MetricDao {
     //  01:12 is the 72nd minute of the day
     //  5:00 is the 300th minute of the day
     public Integer getMinuteOfDay(ZonedDateTime dateTime) {
-        int hour = dateTime.getHour();
-        int minute = dateTime.getMinute();
+        final int hour = dateTime.getHour();
+        final int minute = dateTime.getMinute();
         return hour * 60 + minute;
     }
 
@@ -159,7 +159,7 @@ public class MetricDaoRedisZSetImpl implements MetricDao {
         // For a sorted set value of "22.0:1", this classes provides
         // the measurement value of 22.0 and the minuteOfDay value of 1.
         public static MeasurementMinute fromZSetValue(String zSetValue) {
-            String[] parts = zSetValue.split(":");
+            final String[] parts = zSetValue.split(":");
             if (parts.length == 2) {
                 return new MeasurementMinute(Double.valueOf(parts[0]),
                         Integer.valueOf(parts[1]));
@@ -172,7 +172,7 @@ public class MetricDaoRedisZSetImpl implements MetricDao {
         public MeasurementMinute(Double measurement, Integer minuteOfDay) {
             this.measurement = measurement;
             this.minuteOfDay = minuteOfDay;
-            this.decimalFormat = new DecimalFormat("#.##");
+            decimalFormat = new DecimalFormat("#.##");
         }
 
         public Integer getMinuteOfDay() {
@@ -183,6 +183,7 @@ public class MetricDaoRedisZSetImpl implements MetricDao {
             return measurement;
         }
 
+        @Override
         public String toString() {
             return decimalFormat.format(measurement) + ':' + minuteOfDay;
         }

@@ -55,24 +55,24 @@ public class LoadCommand extends Command {
 
     @Override
     public void run(Bootstrap<?> bootstrap, Namespace namespace) throws Exception {
-        JedisPool jedisPool;
-        String password = (String)namespace.get("password");
+        final JedisPool jedisPool;
+        final String password = namespace.get("password");
 
-        System.out.println("Using Redis at " + (String)namespace.get("host") + ":" + namespace.get("port"));
-        if (password.length() > 0) {
+        System.out.println("Using Redis at " + namespace.get("host") + ':' + namespace.get("port"));
+        if (!password.isEmpty()) {
             jedisPool = new JedisPool(new JedisPoolConfig(),
-                    (String)namespace.get("host"), namespace.get("port"), 2000, (String)namespace.get("password"));
+                    namespace.get("host"), namespace.get("port"), 2000, (String)namespace.get("password"));
         } else {
             jedisPool = new JedisPool((String)namespace.get("host"), namespace.get("port"));
         }
 
-        DataLoader loader = new DataLoader(jedisPool);
-        Boolean flush = namespace.get("flush");
-        if (flush) {
+        final DataLoader loader = new DataLoader(jedisPool);
+        final Boolean flush = namespace.get("flush");
+        if (Boolean.TRUE.equals(flush)) {
             loader.flush();
         }
         loader.load();
-        SampleDataGenerator generator = new SampleDataGenerator(jedisPool);
+        final SampleDataGenerator generator = new SampleDataGenerator(jedisPool);
         generator.generateHistorical(1);
         System.out.println("Data load complete!");
         System.exit(0);

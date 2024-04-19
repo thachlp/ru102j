@@ -15,7 +15,7 @@ import java.util.List;
 
 /**
  * Retain metrics using the Redis Time Series module
- * (see https://github.com/RedisLabsModules/RedisTimeSeries)
+ * (see <a href="https://github.com/RedisLabsModules/RedisTimeSeries">...</a>)
  *
  */
 public class MetricDaoRedisTSImpl implements MetricDao {
@@ -25,22 +25,22 @@ public class MetricDaoRedisTSImpl implements MetricDao {
     private final RedisTimeSeries rts;
 
     public MetricDaoRedisTSImpl(JedisPool pool) {
-        this.rts = new RedisTimeSeries(pool);
+        rts = new RedisTimeSeries(pool);
     }
 
     @Override
     public void insert(MeterReading reading) {
         insertMetric(reading.getSiteId(), reading.getWhGenerated(),
-                MetricUnit.WHGenerated, reading.getDateTime());
+                MetricUnit.WH_GENERATED, reading.getDateTime());
         insertMetric(reading.getSiteId(), reading.getWhUsed(),
-                MetricUnit.WHUsed, reading.getDateTime());
+                MetricUnit.WH_USED, reading.getDateTime());
         insertMetric(reading.getSiteId(), reading.getTempC(),
-                MetricUnit.TemperatureCelsius, reading.getDateTime());
+                MetricUnit.TEMPERATURE_CELSIUS, reading.getDateTime());
     }
 
     private void insertMetric(Long siteId, Double value, MetricUnit unit,
                               ZonedDateTime dateTime) {
-        String metricKey = RedisSchema.getTSKey(siteId, unit);
+        final String metricKey = RedisSchema.getTSKey(siteId, unit);
         rts.add(metricKey, dateTime.toEpochSecond() * 1000, value, RETENTION_MS);
     }
 
@@ -49,18 +49,18 @@ public class MetricDaoRedisTSImpl implements MetricDao {
     // provided timestamp.
     @Override
     public List<Measurement> getRecent(Long siteId, MetricUnit unit, ZonedDateTime time, Integer limit) {
-        List<Measurement> measurements = new ArrayList<>();
-        String metricKey = RedisSchema.getTSKey(siteId, unit);
+        final List<Measurement> measurements = new ArrayList<>();
+        final String metricKey = RedisSchema.getTSKey(siteId, unit);
 
-        Long nowMs = time.toEpochSecond() * 1000;
-        Long initialTimestamp = nowMs - (limit * 60) * 1000;
-        Value[] values = rts.range(metricKey, initialTimestamp, nowMs);
+        final Long nowMs = time.toEpochSecond() * 1000;
+        final Long initialTimestamp = nowMs - limit * 60 * 1000;
+        final Value[] values = rts.range(metricKey, initialTimestamp, nowMs);
 
         for (int j=0; j<limit && j<values.length; j++) {
-            Measurement m = new Measurement();
+            final Measurement m = new Measurement();
             m.setSiteId(siteId);
             m.setMetricUnit(unit);
-            Instant i = Instant.ofEpochSecond(values[j].getTime() / 1000);
+            final Instant i = Instant.ofEpochSecond(values[j].getTime() / 1000);
             m.setDateTime(ZonedDateTime.ofInstant(i, ZoneId.of("UTC")));
             m.setValue(values[j].getValue());
             measurements.add(m);

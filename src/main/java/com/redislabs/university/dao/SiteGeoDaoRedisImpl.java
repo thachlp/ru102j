@@ -5,6 +5,7 @@ import com.redislabs.university.api.GeoQuery;
 import com.redislabs.university.api.Site;
 import redis.clients.jedis.*;
 
+import javax.annotation.Nullable;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -17,9 +18,10 @@ public class SiteGeoDaoRedisImpl implements SiteGeoDao {
     }
 
     @Override
+    @Nullable
     public Site findById(long id) {
         try (Jedis jedis = jedisPool.getResource()) {
-            Map<String, String> fields =
+            final Map<String, String> fields =
                     jedis.hgetAll(RedisSchema.getSiteHashKey(id));
             if (fields == null || fields.isEmpty()) {
                 return null;
@@ -31,12 +33,12 @@ public class SiteGeoDaoRedisImpl implements SiteGeoDao {
     @Override
     public Set<Site> findAll() {
         try (Jedis jedis = jedisPool.getResource()) {
-            Set<String> keys = jedis.zrange(RedisSchema.getSiteGeoKey(), 0, -1);
-            Pipeline pipeline = jedis.pipelined();
-            Set<Site> sites = new HashSet<>(keys.size());
-            Set<Response<Map<String, String>>> responses = new HashSet<>();
+            final Set<String> keys = jedis.zrange(RedisSchema.getSiteGeoKey(), 0, -1);
+            final Pipeline pipeline = jedis.pipelined();
+            final Set<Site> sites = new HashSet<>(keys.size());
+            final Set<Response<Map<String, String>>> responses = new HashSet<>();
             for (String key : keys) {
-                Response<Map<String, String>> response = pipeline.hgetAll(key);
+                final Response<Map<String, String>> response = pipeline.hgetAll(key);
                 if (response != null) {
                     responses.add(response);
                 }
@@ -65,30 +67,30 @@ public class SiteGeoDaoRedisImpl implements SiteGeoDao {
 //     }
     // Comment out the above, and uncomment what's below
     private Set<Site> findSitesByGeoWithCapacity(GeoQuery query) {
-        Set<Site> results = new HashSet<>();
-        Coordinate coord = query.getCoordinate();
-        Double radius = query.getRadius();
-        GeoUnit radiusUnit = query.getRadiusUnit();
+        final Set<Site> results = new HashSet<>();
+        final Coordinate coord = query.getCoordinate();
+        final Double radius = query.getRadius();
+        final GeoUnit radiusUnit = query.getRadiusUnit();
 
          try (Jedis jedis = jedisPool.getResource()) {
              // START Challenge #5
              // TODO: Challenge #5: Get the sites matching the geo query, store them
              //Set<String> keys = jedis.zrange(RedisSchema.getSiteGeoKey(), 0, -1);
-             List<GeoRadiusResponse> radiusResponses = jedis.georadius(RedisSchema.getSiteGeoKey(), coord.getLng(),
+             final List<GeoRadiusResponse> radiusResponses = jedis.georadius(RedisSchema.getSiteGeoKey(), coord.getLng(),
                  coord.getLat(), radius, radiusUnit);
              // END Challenge #5
 
-             Set<Site> sites = radiusResponses.stream()
+             final Set<Site> sites = radiusResponses.stream()
                      .map(response -> jedis.hgetAll(response.getMemberByString()))
                      .filter(Objects::nonNull)
                      .map(Site::new).collect(Collectors.toSet());
 
              // START Challenge #5
-             Pipeline pipeline = jedis.pipelined();
-             Map<Long, Response<Double>> scores = new HashMap<>(sites.size());
+             final Pipeline pipeline = jedis.pipelined();
+             final Map<Long, Response<Double>> scores = new HashMap<>(sites.size());
              // TODO: Challenge #5: Add the code that populates the scores HashMap...
              for (Site site : sites) {
-                 Response<Double> score = pipeline.zscore(RedisSchema.getCapacityRankingKey(),
+                 final Response<Double> score = pipeline.zscore(RedisSchema.getCapacityRankingKey(),
                      String.valueOf(site.getId()));
                  scores.put(site.getId(), score);
              }
@@ -106,12 +108,12 @@ public class SiteGeoDaoRedisImpl implements SiteGeoDao {
     }
 
     private Set<Site> findSitesByGeo(GeoQuery query) {
-        Coordinate coord = query.getCoordinate();
-        Double radius = query.getRadius();
-        GeoUnit radiusUnit = query.getRadiusUnit();
+        final Coordinate coord = query.getCoordinate();
+        final Double radius = query.getRadius();
+        final GeoUnit radiusUnit = query.getRadiusUnit();
 
         try (Jedis jedis = jedisPool.getResource()) {
-            List<GeoRadiusResponse> radiusResponses =
+            final List<GeoRadiusResponse> radiusResponses =
                     jedis.georadius(RedisSchema.getSiteGeoKey(), coord.getLng(),
                             coord.getLat(), radius, radiusUnit);
 
@@ -125,15 +127,15 @@ public class SiteGeoDaoRedisImpl implements SiteGeoDao {
     @Override
     public void insert(Site site) {
          try (Jedis jedis = jedisPool.getResource()) {
-             String key = RedisSchema.getSiteHashKey(site.getId());
+             final String key = RedisSchema.getSiteHashKey(site.getId());
              jedis.hmset(key, site.toMap());
 
              if (site.getCoordinate() == null) {
                  throw new IllegalArgumentException("Coordinate required for Geo " +
                          "insert.");
              }
-             double longitude = site.getCoordinate().getGeoCoordinate().getLongitude();
-             double latitude = site.getCoordinate().getGeoCoordinate().getLatitude();
+             final double longitude = site.getCoordinate().getGeoCoordinate().getLongitude();
+             final double latitude = site.getCoordinate().getGeoCoordinate().getLatitude();
              jedis.geoadd(RedisSchema.getSiteGeoKey(), longitude, latitude,
                      key);
          }

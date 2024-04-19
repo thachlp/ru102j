@@ -36,16 +36,14 @@ public class RunCommand extends Command {
 
     @Override
     public void run(Bootstrap<?> bootstrap, Namespace namespace) {
-        String host = namespace.get("host");
-        Integer port = namespace.get("port");
-        String example = ((String) namespace.get("examples")).toLowerCase();
-        switch (example) {
-            case "hello":
-                Hello hello = new Hello(host, port);
-                hello.say();
-                break;
-            default:
-                System.out.println("Unknown example: " + example);
+        final String host = namespace.get("host");
+        final Integer port = namespace.get("port");
+        final String example = ((String) namespace.get("examples")).toLowerCase();
+        if ("hello".equals(example)) {
+            final Hello hello = new Hello(host, port);
+            hello.say();
+        } else {
+            System.out.println("Unknown example: " + example);
         }
     }
 }

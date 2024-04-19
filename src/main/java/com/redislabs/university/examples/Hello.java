@@ -13,9 +13,9 @@ public class Hello {
     }
 
     public void say() {
-        Jedis jedis = new Jedis(host, port);
-        String response = jedis.set("hello", "world");
-        String saying = jedis.get("hello");
+        final Jedis jedis = new Jedis(host, port);
+        final String response = jedis.set("hello", "world");
+        final String saying = jedis.get("hello");
         System.out.println("Hello, " + saying);
         jedis.close();
     }

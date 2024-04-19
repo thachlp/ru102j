@@ -47,7 +47,7 @@ public class MultiKeyTest {
         final Pipeline p = jedis.pipelined();
 
         final Response<Long> hsetResponse = p.hset(statusKey, "available", "true");
-        final Response<Long> expireResponse = p.expire(statusKey, 1000);
+        final Response<Long> expireResponse = p.pexpire(statusKey, 1000);
         final Response<Long> saddResponse = p.sadd(availableKey,
                 String.valueOf(siteId));
 
@@ -64,7 +64,7 @@ public class MultiKeyTest {
         final Transaction t = jedis.multi();
 
         final Response<Long> hsetResponse = t.hset(statusKey, "available", "true");
-        final Response<Long> expireResponse = t.expire(statusKey, 1000);
+        final Response<Long> expireResponse = t.pexpire(statusKey, 1000);
         final Response<Long> saddResponse = t.sadd(availableKey,
                 String.valueOf(siteId));
 

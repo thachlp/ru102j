@@ -21,14 +21,14 @@ public class SiteStats {
     public static final String MAX_CAPACITY_FIELD = "maxCapacity";
 
     public SiteStats(Map<String, String> map) {
-        this.lastReportingTime = parseTime(map.get(REPORTING_TIME_FIELD));
-        this.meterReadingCount = parseLong(map.get(COUNT_FIELD));
-        this.maxWhGenerated = parseDouble(map.get(MAX_WH_FIELD));
-        this.minWhGenerated = parseDouble(map.get(MIN_WH_FIELD));
-        this.maxCapacity = parseDouble(map.get(MAX_CAPACITY_FIELD));
+        lastReportingTime = parseTime(map.get(REPORTING_TIME_FIELD));
+        meterReadingCount = parseLong(map.get(COUNT_FIELD));
+        maxWhGenerated = parseDouble(map.get(MAX_WH_FIELD));
+        minWhGenerated = parseDouble(map.get(MIN_WH_FIELD));
+        maxCapacity = parseDouble(map.get(MAX_CAPACITY_FIELD));
     }
 
-    private Double parseDouble(String value) {
+    private static Double parseDouble(String value) {
         if (value == null) {
             return null;
         } else {
@@ -36,7 +36,7 @@ public class SiteStats {
         }
     }
 
-    private Long parseLong(String value) {
+    private static Long parseLong(String value) {
         if (value == null) {
             return null;
         } else {
@@ -44,7 +44,7 @@ public class SiteStats {
         }
     }
 
-    private ZonedDateTime parseTime(String time) {
+    private static ZonedDateTime parseTime(String time) {
         if (time == null) {
             return null;
         } else {
@@ -74,9 +74,13 @@ public class SiteStats {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        SiteStats siteStats = (SiteStats) o;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        final SiteStats siteStats = (SiteStats) o;
         return Objects.equals(lastReportingTime, siteStats.lastReportingTime) &&
                 Objects.equals(meterReadingCount, siteStats.meterReadingCount) &&
                 Objects.equals(maxWhGenerated, siteStats.maxWhGenerated) &&
