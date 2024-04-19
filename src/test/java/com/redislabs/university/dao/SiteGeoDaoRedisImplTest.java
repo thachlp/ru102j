@@ -7,7 +7,6 @@ import com.redislabs.university.api.GeoQuery;
 import com.redislabs.university.api.MeterReading;
 import com.redislabs.university.api.Site;
 import org.junit.*;
-import org.junit.rules.ExpectedException;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
@@ -16,8 +15,6 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.empty;
 import static org.junit.Assert.*;
 
 public class SiteGeoDaoRedisImplTest {
@@ -87,7 +84,7 @@ public class SiteGeoDaoRedisImplTest {
     @Test
     public void findAllWithEmptySites() {
         final SiteDaoRedisImpl dao = new SiteDaoRedisImpl(jedisPool);
-        assertEquals(dao.findAll(), empty());
+        assertTrue(dao.findAll().isEmpty());
     }
 
     @Test
@@ -113,7 +110,7 @@ public class SiteGeoDaoRedisImplTest {
 
         // Expand the radius to return all 3 sites
         final Set<Site> californiaSites = dao.findByGeo(new GeoQuery(unionCity, 60.0, "KM"));
-        assertEquals(1, californiaSites.size());
+        assertEquals(3, californiaSites.size());
     }
 
     // Challenge #5
@@ -177,9 +174,8 @@ public class SiteGeoDaoRedisImplTest {
         final SiteGeoDao dao = new SiteGeoDaoRedisImpl(jedisPool);
         final Site vallejo = new Site(7, 4.5, 3, "637 Britannia Drive",
                 "Vallejo", "CA", "94591");
-        final IllegalArgumentException thrown = assertThrows(IllegalArgumentException.class, () -> {
-            dao.insert(vallejo);
-        });
+        final IllegalArgumentException thrown = assertThrows(IllegalArgumentException.class,
+                () -> dao.insert(vallejo));
         assertEquals("Coordinate required for Geo insert.", thrown.getMessage());
     }
 }
