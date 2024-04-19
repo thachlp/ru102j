@@ -27,7 +27,6 @@ public class JedisFactory {
     }
 
     public JedisPool build() {
-        final String password = getPassword();
         final JedisPool pool;
 
         if (!password.isEmpty()) {
