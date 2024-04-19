@@ -17,14 +17,10 @@ public class RateLimiterFixedDaoRedisImplTest {
     private static Jedis jedis;
     private static TestKeyManager keyManager;
 
-    @Rule
-    public ExpectedException thrown = ExpectedException.none();
-
     @BeforeClass
     public static void setUp() throws Exception {
-        String password = HostPort.getRedisPassword();
-
-        if (password.length() > 0) {
+        final String password = HostPort.getRedisPassword();
+        if (!password.isEmpty()) {
             jedisPool = new JedisPool(new JedisPoolConfig(), HostPort.getRedisHost(), HostPort.getRedisPort(), 2000, password);
         } else {
             jedisPool = new JedisPool(HostPort.getRedisHost(), HostPort.getRedisPort());
@@ -32,10 +28,9 @@ public class RateLimiterFixedDaoRedisImplTest {
 
         jedis = new Jedis(HostPort.getRedisHost(), HostPort.getRedisPort());
 
-        if (password.length() > 0) {
+        if (!password.isEmpty()) {
             jedis.auth(password);
         }
-
         keyManager = new TestKeyManager("test");
     }
 
@@ -53,7 +48,7 @@ public class RateLimiterFixedDaoRedisImplTest {
     @Test
     public void hit() {
         int exceptionCount = 0;
-        RateLimiter limiter = new RateLimiterFixedDaoRedisImpl(jedisPool,
+        final RateLimiter limiter = new RateLimiterFixedDaoRedisImpl(jedisPool,
                 MinuteInterval.ONE, 10);
         for (int i=0; i<10; i++) {
             try {
@@ -62,11 +57,6 @@ public class RateLimiterFixedDaoRedisImplTest {
                 exceptionCount += 1;
             }
         }
-
-        assertThat(exceptionCount, is(0));
-    }
-
-    @Test
-    public void getMinuteOfDayBlock() {
+        assertEquals(0, exceptionCount);
     }
 }

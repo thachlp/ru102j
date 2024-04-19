@@ -24,9 +24,9 @@ public class FeedDaoRedisImplTest {
 
     @BeforeClass
     public static void setUp() throws Exception {
-        String password = HostPort.getRedisPassword();
+        final String password = HostPort.getRedisPassword();
 
-        if (password.length() > 0) {
+        if (!password.isEmpty()) {
             jedisPool = new JedisPool(new JedisPoolConfig(), HostPort.getRedisHost(), HostPort.getRedisPort(), 2000, password);
         } else {
             jedisPool = new JedisPool(HostPort.getRedisHost(), HostPort.getRedisPort());
@@ -34,7 +34,7 @@ public class FeedDaoRedisImplTest {
 
         jedis = new Jedis(HostPort.getRedisHost(), HostPort.getRedisPort());
 
-        if (password.length() > 0) {
+        if (!password.isEmpty()) {
             jedis.auth(password);
         }
 
@@ -55,25 +55,25 @@ public class FeedDaoRedisImplTest {
     // Challenge #6
     @Test
     public void testBasicInsertReturnsRecent() {
-        FeedDao dao = new FeedDaoRedisImpl(jedisPool);
-        MeterReading reading0 = generateMeterReading(1L, ZonedDateTime.now());
-        MeterReading reading1 = generateMeterReading(1L,
+        final FeedDao dao = new FeedDaoRedisImpl(jedisPool);
+        final MeterReading reading0 = generateMeterReading(1L, ZonedDateTime.now());
+        final MeterReading reading1 = generateMeterReading(1L,
                 ZonedDateTime.now().minusMinutes(1));
         dao.insert(reading0);
         dao.insert(reading1);
-        List<MeterReading> globalList = dao.getRecentGlobal(100);
+        final List<MeterReading> globalList = dao.getRecentGlobal(100);
         assertThat(globalList.size(), is(2));
         assertThat(globalList.get(0), is(reading1));
         assertThat(globalList.get(1), is(reading0));
 
-        List<MeterReading> siteList = dao.getRecentForSite(1, 100);
+        final List<MeterReading> siteList = dao.getRecentForSite(1, 100);
         assertThat(siteList.size(), is(2));
         assertThat(siteList.get(0), is(reading1));
         assertThat(siteList.get(1), is(reading0));
     }
 
-    private MeterReading generateMeterReading(long siteId, ZonedDateTime dateTime) {
-        MeterReading reading = new MeterReading();
+    private static MeterReading generateMeterReading(long siteId, ZonedDateTime dateTime) {
+        final MeterReading reading = new MeterReading();
         reading.setSiteId(siteId);
         reading.setDateTime(dateTime);
         reading.setTempC(15.0);

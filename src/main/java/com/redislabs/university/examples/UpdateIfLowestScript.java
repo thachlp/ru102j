@@ -23,13 +23,13 @@ public class UpdateIfLowestScript {
     // Load the script and cache the sha of the script.
     public UpdateIfLowestScript(Jedis jedis) {
         this.jedis = jedis;
-        this.sha = jedis.scriptLoad(SCRIPT);
+        sha = jedis.scriptLoad(SCRIPT);
     }
 
     public boolean updateIfLowest(String key, Integer newValue) {
-        List<String> keys = Collections.singletonList(key);
-        List<String> args = Collections.singletonList(String.valueOf(newValue));
-        Object response = jedis.evalsha(sha, keys, args);
+        final List<String> keys = Collections.singletonList(key);
+        final List<String> args = Collections.singletonList(String.valueOf(newValue));
+        final Object response = jedis.evalsha(sha, keys, args);
         return (Long)response == 1;
     }
 }

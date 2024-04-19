@@ -1,7 +1,6 @@
 package com.redislabs.university.core;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import io.dropwizard.setup.Environment;
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
 
@@ -27,11 +26,11 @@ public class JedisFactory {
         return password;
     }
 
-    public JedisPool build(Environment environment) {
-        String password = getPassword();
-        JedisPool pool;
+    public JedisPool build() {
+        final String password = getPassword();
+        final JedisPool pool;
 
-        if (password.length() > 0) {
+        if (!password.isEmpty()) {
             pool = new JedisPool(new JedisPoolConfig(), getHost(), getPort(), 2000, getPassword());
         } else {
             pool = new JedisPool(new JedisPoolConfig(), getHost(), getPort());

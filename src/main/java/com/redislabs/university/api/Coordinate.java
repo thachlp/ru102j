@@ -52,9 +52,13 @@ public class Coordinate {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Coordinate that = (Coordinate) o;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        final Coordinate that = (Coordinate) o;
         return Objects.equals(lat, that.lat) &&
                 Objects.equals(lng, that.lng);
     }

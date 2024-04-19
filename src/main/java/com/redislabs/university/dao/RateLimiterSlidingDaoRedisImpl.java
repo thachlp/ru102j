@@ -13,7 +13,7 @@ public class RateLimiterSlidingDaoRedisImpl implements RateLimiter {
 
     public RateLimiterSlidingDaoRedisImpl(JedisPool pool, long windowSizeMS,
                                           long maxHits) {
-        this.jedisPool = pool;
+        jedisPool = pool;
         this.windowSizeMS = windowSizeMS;
         this.maxHits = maxHits;
     }
@@ -23,15 +23,15 @@ public class RateLimiterSlidingDaoRedisImpl implements RateLimiter {
     public void hit(String name) throws RateLimitExceededException {
         // START CHALLENGE #7
         try (Jedis jedis = jedisPool.getResource()) {
-            String key = getKey(name);
-            Transaction trans = jedis.multi();
+            final String key = getKey(name);
+            final Transaction trans = jedis.multi();
             trans.zadd(key,
                 System.currentTimeMillis(),
                 String.valueOf(System.currentTimeMillis() - Math.random()));
             trans.zremrangeByScore(key,
                 -1,
                 System.currentTimeMillis() - (double)windowSizeMS);
-            Response<Long> response = trans.zcard(key);
+            final Response<Long> response = trans.zcard(key);
             trans.exec();
             if (response != null && response.get() > maxHits) {
                 throw new RateLimitExceededException();

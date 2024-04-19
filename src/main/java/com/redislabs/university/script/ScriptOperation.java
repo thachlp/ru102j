@@ -1,8 +1,8 @@
 package com.redislabs.university.script;
 
 public enum ScriptOperation {
-    GREATERTHAN(">"),
-    LESSTHAN("<");
+    GREATER_THAN(">"),
+    LESS_THAN("<");
 
     private final String symbol;
 

@@ -10,14 +10,13 @@ import java.util.List;
 
 /* Encapsulates a server-side Lua script to compare
  * a value stored in a hash field and update if
- * greater than or less than a the provided value,
+ * greater than or less than the provided value,
  * as requested.
  */
 public class CompareAndUpdateScript {
 
     private final String sha;
-    public static String script = "" +
-            "local key = KEYS[1] " +
+    public static final String SCRIPT = "local key = KEYS[1] " +
             "local field = ARGV[1] " +
             "local value = ARGV[2] " +
             "local op = ARGV[3] " +
@@ -36,25 +35,25 @@ public class CompareAndUpdateScript {
 
     public CompareAndUpdateScript(JedisPool jedisPool) {
         try (Jedis jedis = jedisPool.getResource()) {
-            this.sha = jedis.scriptLoad(script);
+            sha = jedis.scriptLoad(SCRIPT);
         }
     }
 
     public void updateIfGreater(Transaction jedis, String key, String field,
                                Double value) {
-        update(jedis, key, field, value, ScriptOperation.GREATERTHAN);
+        update(jedis, key, field, value, ScriptOperation.GREATER_THAN);
     }
 
     public void updateIfLess(Transaction jedis, String key, String field,
                                Double value) {
-        update(jedis, key, field, value, ScriptOperation.LESSTHAN);
+        update(jedis, key, field, value, ScriptOperation.LESS_THAN);
     }
 
     private void update(Transaction jedis, String key, String field, Double value,
                            ScriptOperation op) {
         if (sha != null) {
-            List<String> keys = Collections.singletonList(key);
-            List<String> args = Arrays.asList(field, String.valueOf(value),
+            final List<String> keys = Collections.singletonList(key);
+            final List<String> args = Arrays.asList(field, String.valueOf(value),
                     op.getSymbol());
             jedis.evalsha(sha, keys, args);
         }

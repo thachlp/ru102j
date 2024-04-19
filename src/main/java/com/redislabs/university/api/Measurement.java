@@ -22,7 +22,7 @@ public class Measurement {
     public Measurement(Long siteId, MetricUnit metricUnit, ZonedDateTime date, Double value) {
         this.siteId = siteId;
         this.metricUnit = metricUnit;
-        this.dateTime = date;
+        dateTime = date;
         this.value = value;
     }
 
@@ -68,9 +68,13 @@ public class Measurement {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Measurement that = (Measurement) o;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        final Measurement that = (Measurement) o;
         return Objects.equals(siteId, that.siteId) &&
                 Objects.equals(dateTime, that.dateTime) &&
                 Objects.equals(value, that.value) &&

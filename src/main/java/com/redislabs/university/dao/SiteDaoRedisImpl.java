@@ -18,8 +18,8 @@ public class SiteDaoRedisImpl implements SiteDao {
     @Override
     public void insert(Site site) {
         try (Jedis jedis = jedisPool.getResource()) {
-            String hashKey = RedisSchema.getSiteHashKey(site.getId());
-            String siteIdKey = RedisSchema.getSiteIDsKey();
+            final String hashKey = RedisSchema.getSiteHashKey(site.getId());
+            final String siteIdKey = RedisSchema.getSiteIDsKey();
             jedis.hmset(hashKey, site.toMap());
             jedis.sadd(siteIdKey, hashKey);
         }
@@ -28,8 +28,8 @@ public class SiteDaoRedisImpl implements SiteDao {
     @Override
     public Site findById(long id) {
         try (Jedis jedis = jedisPool.getResource()) {
-            String key = RedisSchema.getSiteHashKey(id);
-            Map<String, String> fields = jedis.hgetAll(key);
+            final String key = RedisSchema.getSiteHashKey(id);
+            final Map<String, String> fields = jedis.hgetAll(key);
             if (fields == null || fields.isEmpty()) {
                 return null;
             } else {
@@ -42,10 +42,10 @@ public class SiteDaoRedisImpl implements SiteDao {
     @Override
     public Set<Site> findAll() {
         try (Jedis jedis = jedisPool.getResource()) {
-            Set<String> keys = jedis.smembers(RedisSchema.getSiteIDsKey());
-            Set<Site> sites = new HashSet<>(keys.size());
+            final Set<String> keys = jedis.smembers(RedisSchema.getSiteIDsKey());
+            final Set<Site> sites = new HashSet<>(keys.size());
             for (String key : keys) {
-                Map<String, String> fields = jedis.hgetAll(key);
+                final Map<String, String> fields = jedis.hgetAll(key);
                 if (fields != null && !fields.isEmpty()) {
                     sites.add(new Site(fields));
                 }

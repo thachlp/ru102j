@@ -38,7 +38,7 @@ public class RateLimiterFixedDaoRedisImpl implements RateLimiter {
                                         MinuteInterval interval, long maxHits) {
         this.jedisPool = jedisPool;
         this.interval = interval;
-        this.expiration = interval.getValue() * 60;
+        expiration = interval.getValue() * 60;
         this.maxHits = maxHits;
     }
 
@@ -46,10 +46,10 @@ public class RateLimiterFixedDaoRedisImpl implements RateLimiter {
     @Override
     public void hit(String name) throws RateLimitExceededException {
         try (Jedis jedis = jedisPool.getResource()) {
-            String key = getKey(name);
-            Pipeline pipeline = jedis.pipelined();
-            Response<Long> hits = pipeline.incr(key);
-            pipeline.expire(key, expiration);
+            final String key = getKey(name);
+            final Pipeline pipeline = jedis.pipelined();
+            final Response<Long> hits = pipeline.incr(key);
+            pipeline.pexpire(key, expiration);
             pipeline.sync();
             if (hits.get() > maxHits) {
                 throw new RateLimitExceededException();
@@ -58,12 +58,12 @@ public class RateLimiterFixedDaoRedisImpl implements RateLimiter {
     }
 
     private String getKey(String name) {
-        int dayMinuteBlock = getMinuteOfDayBlock(ZonedDateTime.now());
+        final int dayMinuteBlock = getMinuteOfDayBlock(ZonedDateTime.now());
         return RedisSchema.getRateLimiterKey(name, dayMinuteBlock, maxHits);
     }
 
     private int getMinuteOfDayBlock(ZonedDateTime dateTime) {
-        int minuteOfDay = dateTime.getHour() * 60 + dateTime.getMinute();
+        final int minuteOfDay = dateTime.getHour() * 60 + dateTime.getMinute();
         return minuteOfDay / interval.getValue();
     }
 }

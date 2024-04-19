@@ -12,7 +12,10 @@ import java.time.ZonedDateTime;
  * contains a reference to all possible key names
  * used by this application.
  */
-public class RedisSchema {
+public final class RedisSchema {
+    private RedisSchema() {
+    }
+
     // sites:info:[siteId]
     // Redis type: hash
     static String getSiteHashKey(long siteId) {
@@ -29,7 +32,7 @@ public class RedisSchema {
     // Redis type: sorted set
     public static String getSiteStatsKey(Long siteId, ZonedDateTime dateTime) {
         return KeyHelper.getKey("sites:stats:" +
-                getYearMonthDay(dateTime) + ":" +
+                getYearMonthDay(dateTime) + ':' +
                 siteId);
     }
 
@@ -38,16 +41,16 @@ public class RedisSchema {
     static String getRateLimiterKey(String name, int minuteBlock,
                                     long maxHits) {
         return KeyHelper.getKey("limiter:" +
-                name + ":" +
-                minuteBlock + ":" +
+                name + ':' +
+                minuteBlock + ':' +
                 maxHits);
     }
 
     static String getRateSlideWindowLimiterKey(String name, Long windowSize,
         long maxHits) {
         return KeyHelper.getKey("limiter:" +
-            windowSize + ":" +
-            name + ":" +
+            windowSize + ':' +
+            name + ':' +
             maxHits);
     }
 
@@ -70,9 +73,9 @@ public class RedisSchema {
         return KeyHelper.getPrefix() +
                 ":metric:" +
                 unit.getShortName() +
-                ":" +
+                ':' +
                 getYearMonthDay(dateTime) +
-                ":" +
+                ':' +
                 siteId;
     }
 
@@ -90,14 +93,14 @@ public class RedisSchema {
 
     // Return the year and month in the form YEAR-MONTH-DAY
     private static String getYearMonthDay(ZonedDateTime dateTime) {
-        return String.valueOf(dateTime.getYear()) + "-" +
-                    dateTime.getMonthValue() + "-" +
+        return String.valueOf(dateTime.getYear()) + '-' +
+                    dateTime.getMonthValue() + '-' +
                     dateTime.getDayOfMonth();
     }
 
     // sites:ts:[siteId]:[unit]
     // Redis type: RedisTimeSeries
     static String getTSKey(Long siteId, MetricUnit unit) {
-        return KeyHelper.getKey("sites:ts:" + siteId + ":" + unit.toString());
+        return KeyHelper.getKey("sites:ts:" + siteId + ':' + unit.toString());
     }
 }

@@ -1,9 +1,9 @@
 package com.redislabs.university.api;
 
 public enum MetricUnit {
-    WHGenerated("whG"),
-    WHUsed("whU"),
-    TemperatureCelsius("tempC");
+    WH_GENERATED("whG"),
+    WH_USED("whU"),
+    TEMPERATURE_CELSIUS("tempC");
 
     private final String shortName;
 

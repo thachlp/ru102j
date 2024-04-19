@@ -36,12 +36,12 @@ public class MetricsResource {
             count = DEFAULT_METRIC_COUNT;
         }
         // Get kWhGenerated measurements
-        List<Measurement> generated = metricDao.getRecent(siteId, MetricUnit.WHGenerated,
+        List<Measurement> generated = metricDao.getRecent(siteId, MetricUnit.WH_GENERATED,
                 ZonedDateTime.now(ZoneOffset.UTC), count);
         plots.add(new Plot("Watt-Hours Generated", generated));
 
         // Get kWhUsed measurements
-        List<Measurement> used = metricDao.getRecent(siteId, MetricUnit.WHUsed,
+        List<Measurement> used = metricDao.getRecent(siteId, MetricUnit.WH_USED,
                 ZonedDateTime.now(ZoneOffset.UTC), count);
         plots.add(new Plot("Watt-Hours Used", used));
 

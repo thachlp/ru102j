@@ -23,21 +23,21 @@ public class DataLoader {
 
     public DataLoader(JedisPool jedisPool) {
         this.jedisPool = jedisPool;
-        ClassLoader classloader = Thread.currentThread().getContextClassLoader();
-        this.inputStream = classloader.getResourceAsStream("data/sites.json");
+        final ClassLoader classloader = Thread.currentThread().getContextClassLoader();
+        inputStream = classloader.getResourceAsStream("data/sites.json");
     }
 
     public DataLoader(JedisPool jedisPool, String filename) throws FileNotFoundException {
         this.jedisPool = jedisPool;
-        this.inputStream = new FileInputStream(filename);
+        inputStream = new FileInputStream(filename);
     }
 
     public void load() throws IOException {
         System.out.println("Loading solar sites...");
-        ObjectMapper mapper = new ObjectMapper();
-        List<Site> sites = mapper.readValue(inputStream, new TypeReference<List<Site>>(){});
-        SiteDao siteDao = new SiteDaoRedisImpl(jedisPool);
-        SiteGeoDao siteGeoDao = new SiteGeoDaoRedisImpl(jedisPool);
+        final ObjectMapper mapper = new ObjectMapper();
+        final List<Site> sites = mapper.readValue(inputStream, new TypeReference<List<Site>>(){});
+        final SiteDao siteDao = new SiteDaoRedisImpl(jedisPool);
+        final SiteGeoDao siteGeoDao = new SiteGeoDaoRedisImpl(jedisPool);
         for (Site site : sites) {
             siteDao.insert(site);
             siteGeoDao.insert(site);

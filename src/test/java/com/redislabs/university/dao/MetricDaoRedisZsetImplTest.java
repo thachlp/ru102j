@@ -19,7 +19,7 @@ import static org.junit.Assert.*;
 public class MetricDaoRedisZsetImplTest extends JedisDaoTestBase {
 
     private List<MeterReading> readings;
-    private final Long siteId = 1L;
+    private static final Long siteId = 1L;
     private final ZonedDateTime startingDate = ZonedDateTime.now(ZoneOffset.UTC);
 
     @After
@@ -35,7 +35,7 @@ public class MetricDaoRedisZsetImplTest extends JedisDaoTestBase {
         readings = new ArrayList<>();
         ZonedDateTime time = startingDate;
         for (int i=0; i <  72 * 60; i++) {
-            MeterReading reading = new MeterReading();
+            final MeterReading reading = new MeterReading();
             reading.setSiteId(siteId);
             reading.setTempC(i * 1.0);
             reading.setWhUsed(i * 1.0);
@@ -62,17 +62,17 @@ public class MetricDaoRedisZsetImplTest extends JedisDaoTestBase {
     }
 
     private void testInsertAndRetrieve(int limit) {
-        MetricDao metricDao = new MetricDaoRedisZSetImpl(jedisPool);
+        final MetricDao metricDao = new MetricDaoRedisZSetImpl(jedisPool);
         for (MeterReading reading : readings) {
             metricDao.insert(reading);
         }
 
-        List<Measurement> measurements = metricDao.getRecent(siteId, MetricUnit.WHGenerated,
+        final List<Measurement> measurements = metricDao.getRecent(siteId, MetricUnit.WH_GENERATED,
          startingDate, limit);
-        assertThat(measurements.size(), is(limit));
+        assertEquals(limit, measurements.size());
         int i = limit;
         for (Measurement measurement : measurements) {
-            assertThat(measurement.getValue(), is((i - 1) * 1.0));
+            assertEquals((i - 1) * 1.0, measurement.getValue(), 0.001);
             i -= 1;
         }
     }

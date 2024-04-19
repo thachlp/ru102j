@@ -12,8 +12,8 @@ public class SiteCapacityTuple {
     public SiteCapacityTuple() {}
 
     public SiteCapacityTuple(Tuple tuple) {
-        this.capacity = tuple.getScore();
-        this.siteId = Long.valueOf(tuple.getElement());
+        capacity = tuple.getScore();
+        siteId = Long.valueOf(tuple.getElement());
     }
 
     public SiteCapacityTuple(Long siteId, Double capacity) {
@@ -43,9 +43,13 @@ public class SiteCapacityTuple {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        SiteCapacityTuple that = (SiteCapacityTuple) o;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        final SiteCapacityTuple that = (SiteCapacityTuple) o;
         return Objects.equals(capacity, that.capacity) &&
                 Objects.equals(siteId, that.siteId);
     }

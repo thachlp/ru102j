@@ -30,20 +30,17 @@ public class SiteDaoRedisImplTest {
 
     @BeforeClass
     public static void setUp() throws Exception {
-        String password = HostPort.getRedisPassword();
-
-        if (password.length() > 0) {
+        final String password = HostPort.getRedisPassword();
+        if (!password.isEmpty()) {
             jedisPool = new JedisPool(new JedisPoolConfig(), HostPort.getRedisHost(), HostPort.getRedisPort(), 2000, password);
         } else {
             jedisPool = new JedisPool(HostPort.getRedisHost(), HostPort.getRedisPort());
         }
-
         jedis = new Jedis(HostPort.getRedisHost(), HostPort.getRedisPort());
 
-        if (password.length() > 0) {
+        if (!password.isEmpty()) {
             jedis.auth(password);
         }
-
         keyManager = new TestKeyManager("test");
     }
 
@@ -75,11 +72,11 @@ public class SiteDaoRedisImplTest {
      */
     @Test
     public void findByIdWithExistingSite() {
-        SiteDaoRedisImpl dao = new SiteDaoRedisImpl(jedisPool);
-        Site site = new Site(4L, 5.5, 4, "910 Pine St.",
+        final SiteDaoRedisImpl dao = new SiteDaoRedisImpl(jedisPool);
+        final Site site = new Site(4L, 5.5, 4, "910 Pine St.",
                 "Oakland", "CA", "94577");
         dao.insert(site);
-        Site storedSite = dao.findById(4L);
+        final Site storedSite = dao.findById(4L);
         assertThat(storedSite, is(site));
     }
 
@@ -89,7 +86,7 @@ public class SiteDaoRedisImplTest {
      */
     @Test
     public void findByIdWithMissingSite() {
-        SiteDaoRedisImpl dao = new SiteDaoRedisImpl(jedisPool);
+        final SiteDaoRedisImpl dao = new SiteDaoRedisImpl(jedisPool);
         assertThat(dao.findById(4L), is(nullValue()));
     }
 
@@ -99,7 +96,7 @@ public class SiteDaoRedisImplTest {
      */
     @Test
     public void findAllWithMultipleSites() {
-        SiteDaoRedisImpl dao = new SiteDaoRedisImpl(jedisPool);
+        final SiteDaoRedisImpl dao = new SiteDaoRedisImpl(jedisPool);
         // Insert all sites
         for (Site site : sites) {
             dao.insert(site);
@@ -114,18 +111,18 @@ public class SiteDaoRedisImplTest {
      */
     @Test
     public void findAllWithEmptySites() {
-        SiteDaoRedisImpl dao = new SiteDaoRedisImpl(jedisPool);
+        final SiteDaoRedisImpl dao = new SiteDaoRedisImpl(jedisPool);
         assertThat(dao.findAll(), is(empty()));
     }
 
     @Test
     public void insert() {
-        SiteDaoRedisImpl dao = new SiteDaoRedisImpl(jedisPool);
-        Site site = new Site(4, 5.5, 4, "910 Pine St.",
+        final SiteDaoRedisImpl dao = new SiteDaoRedisImpl(jedisPool);
+        final Site site = new Site(4, 5.5, 4, "910 Pine St.",
                 "Oakland", "CA", "94577");
         dao.insert(site);
 
-        Map<String, String> siteFields = jedis.hgetAll(RedisSchema.getSiteHashKey(4L));
+        final Map<String, String> siteFields = jedis.hgetAll(RedisSchema.getSiteHashKey(4L));
         assertEquals(siteFields, site.toMap());
 
         assertThat(jedis.sismember(RedisSchema.getSiteIDsKey(), RedisSchema.getSiteHashKey(4L)),

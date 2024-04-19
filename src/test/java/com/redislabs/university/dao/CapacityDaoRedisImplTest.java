@@ -30,9 +30,9 @@ public class CapacityDaoRedisImplTest extends JedisDaoTestBase {
     @Before
     public void generateData() {
         readings = new ArrayList<>();
-        ZonedDateTime time = ZonedDateTime.now(ZoneOffset.UTC);
+        final ZonedDateTime time = ZonedDateTime.now(ZoneOffset.UTC);
         for (int i=0; i < 10; i++) {
-            MeterReading reading = new MeterReading((long) i, time, 1.2,
+            final MeterReading reading = new MeterReading((long) i, time, 1.2,
                     (double) i, 22.0);
             readings.add(reading);
         }
@@ -40,25 +40,24 @@ public class CapacityDaoRedisImplTest extends JedisDaoTestBase {
 
     @Test
     public void update() {
-        CapacityDao dao = new CapacityDaoRedisImpl(jedisPool);
+        final CapacityDao dao = new CapacityDaoRedisImpl(jedisPool);
         for (MeterReading reading : readings) {
             dao.update(reading);
         }
-        Set<Tuple> results = jedis.zrevrangeWithScores(RedisSchema.getCapacityRankingKey(), 0, 20);
+        final Set<Tuple> results = jedis.zrevrangeWithScores(RedisSchema.getCapacityRankingKey(), 0, 20);
         assertThat(results.size(), is(10));
-        results.toArray();
     }
 
     @Test
     public void getReport() {
-        CapacityDao dao = new CapacityDaoRedisImpl(jedisPool);
+        final CapacityDao dao = new CapacityDaoRedisImpl(jedisPool);
         for (MeterReading reading : readings) {
             dao.update(reading);
         }
-        CapacityReport results = dao.getReport(5);
-        List<SiteCapacityTuple> highest = results.getHighestCapacity();
+        final CapacityReport results = dao.getReport(5);
+        final List<SiteCapacityTuple> highest = results.getHighestCapacity();
         assertThat(highest.size(), is(5));
-        List<SiteCapacityTuple> lowest = results.getLowestCapacity();
+        final List<SiteCapacityTuple> lowest = results.getLowestCapacity();
         assertThat(lowest.size(), is(5));
 
         assertThat(highest.get(0).getCapacity(),
@@ -72,7 +71,7 @@ public class CapacityDaoRedisImplTest extends JedisDaoTestBase {
     // Challenge #4
     @Test
     public void getRank() {
-        CapacityDao dao = new CapacityDaoRedisImpl(jedisPool);
+        final CapacityDao dao = new CapacityDaoRedisImpl(jedisPool);
         for (MeterReading reading : readings) {
             dao.update(reading);
         }
