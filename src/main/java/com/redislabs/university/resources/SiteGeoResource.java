@@ -34,8 +34,10 @@ public class SiteGeoResource {
             return Response.ok(siteDao.findAll())
                     .header("", "*")
                     .build();
-        } else if (lng != null && lat != null) {
-            Set<Site> results = doGeoQuery(lng, lat, radius, radiusUnit,
+        }
+        if (lng != null && !lng.isBlank()
+                && lat != null && !lat.isBlank()) {
+            final Set<Site> results = doGeoQuery(lng, lat, radius, radiusUnit,
                     onlyExcessCapacity);
             return Response.ok(results)
                     .header(HttpHeaders.ACCESS_CONTROL_ALLOW_ORIGIN, "*")
@@ -49,20 +51,20 @@ public class SiteGeoResource {
 
     private Set<Site> doGeoQuery(String lng, String lat, Double radius,
                                  String radiusUnit, Boolean onlyExcessCapacity) {
-        Coordinate coord = new Coordinate(lng, lat);
+        final Coordinate coord = new Coordinate(lng, lat);
         if (radius == null) {
             radius = DEFAULT_RADIUS;
         }
 
-        if (radiusUnit == null || !(radiusUnit.equals("M") || radiusUnit.equals("KM")
-                || radiusUnit.equals("FT") || radiusUnit.equals("MI"))) {
+        if (!("M".equals(radiusUnit) || "KM".equals(radiusUnit)
+                || "FT".equals(radiusUnit) || "MI".equals(radiusUnit))) {
             radiusUnit = DEFAULT_GEO_UNIT;
         }
 
         if (onlyExcessCapacity == null) {
             onlyExcessCapacity = false;
         }
-        GeoQuery query = new GeoQuery(coord, radius, radiusUnit, onlyExcessCapacity);
+        final GeoQuery query = new GeoQuery(coord, radius, radiusUnit, onlyExcessCapacity);
 
         return siteDao.findByGeo(query);
     }
@@ -70,7 +72,7 @@ public class SiteGeoResource {
     @GET
     @Path("/{id}")
     public Response getSite(@PathParam("id") Long id) {
-        Site site = siteDao.findById(id);
+        final Site site = siteDao.findById(id);
         if (site == null) {
             return Response.noContent().status(404).build();
         }

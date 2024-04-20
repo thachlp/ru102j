@@ -25,7 +25,7 @@ public class FeedResource {
         if (limit == null) {
             limit = FEED_DEFAULT_LIMIT;
         }
-        List<MeterReading> readings = feedDao.getRecentGlobal(limit);
+        final List<MeterReading> readings = feedDao.getRecentGlobal(limit);
         return Response.ok(readings)
                 .build();
     }
@@ -37,7 +37,7 @@ public class FeedResource {
         if (limit == null) {
             limit = FEED_DEFAULT_LIMIT;
         }
-        List<MeterReading> readings = feedDao.getRecentForSite(siteId, limit);
+        final List<MeterReading> readings = feedDao.getRecentForSite(siteId, limit);
         return Response.ok(readings)
                 .build();
     }

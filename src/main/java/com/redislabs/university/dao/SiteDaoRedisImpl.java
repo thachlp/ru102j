@@ -4,6 +4,7 @@ import com.redislabs.university.api.Site;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 
+import javax.annotation.Nullable;
 import java.util.*;
 
 public class SiteDaoRedisImpl implements SiteDao {
@@ -26,6 +27,7 @@ public class SiteDaoRedisImpl implements SiteDao {
     }
 
     @Override
+    @Nullable
     public Site findById(long id) {
         try (Jedis jedis = jedisPool.getResource()) {
             final String key = RedisSchema.getSiteHashKey(id);
