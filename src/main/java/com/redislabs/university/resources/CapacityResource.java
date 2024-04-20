@@ -13,16 +13,16 @@ import javax.ws.rs.core.Response;
 public class CapacityResource {
 
     private final CapacityDao capacityDao;
-    private static final Integer CAPACITY_DEFAULT_LIMIT = 10;
 
     public CapacityResource(CapacityDao capacityDao) {
         this.capacityDao = capacityDao;
     }
 
     @GET
-    @Path("/")
-    public Response getCapacity(@PathParam("limit") Integer limit) {
-        return Response.ok(capacityDao.getReport(CAPACITY_DEFAULT_LIMIT))
+    public Response getCapacity(@QueryParam("limit")
+                                    @DefaultValue("10")
+                                    Integer limit) {
+        return Response.ok(capacityDao.getReport(limit))
                 .header(HttpHeaders.ACCESS_CONTROL_ALLOW_ORIGIN, "*")
                 .build();
     }

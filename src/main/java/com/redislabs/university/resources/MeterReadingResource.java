@@ -51,8 +51,8 @@ public class MeterReadingResource {
     }
 
     @GET
-    public Response getGlobal(@PathParam("n") Integer count) {
-        List<MeterReading> readings = feedDao.getRecentGlobal(getFeedCount(count));
+    public Response getGlobal(@QueryParam("count") Integer count) {
+        final List<MeterReading> readings = feedDao.getRecentGlobal(getFeedCount(count));
         return Response.ok(readings)
                 .header(HttpHeaders.ACCESS_CONTROL_ALLOW_ORIGIN, "*")
                 .build();
@@ -61,15 +61,15 @@ public class MeterReadingResource {
     @GET
     @Path("/{id}")
     public Response getForSite(@PathParam("id") Long id,
-                               @PathParam("n") Integer count) {
-        List<MeterReading> readings =
+                               @QueryParam("count") Integer count) {
+        final List<MeterReading> readings =
                 feedDao.getRecentForSite(id, getFeedCount(count));
         return Response.ok(readings)
                 .header(HttpHeaders.ACCESS_CONTROL_ALLOW_ORIGIN, "*")
                 .build();
     }
 
-    private Integer getFeedCount(Integer count) {
+    private static Integer getFeedCount(Integer count) {
         if (count == null || count < 0) {
             return DEFAULT_RECENT_FEEDS;
         } else if (count > MAX_RECENT_FEEDS) {

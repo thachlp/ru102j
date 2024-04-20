@@ -24,24 +24,24 @@ public class MetricsResource {
     private final MetricDao metricDao;
 
     public MetricsResource(MetricDao dayMetricDao) {
-        this.metricDao = dayMetricDao;
+        metricDao = dayMetricDao;
     }
 
     @GET
     @Path("/{siteId}")
     public Response getSiteMetrics(@PathParam("siteId") Long siteId,
-                                   @PathParam("count") Integer count) {
-        List<Plot> plots = new ArrayList<>();
+                                   @QueryParam("count") Integer count) {
+        final List<Plot> plots = new ArrayList<>();
         if (count == null) {
             count = DEFAULT_METRIC_COUNT;
         }
         // Get kWhGenerated measurements
-        List<Measurement> generated = metricDao.getRecent(siteId, MetricUnit.WH_GENERATED,
+        final List<Measurement> generated = metricDao.getRecent(siteId, MetricUnit.WH_GENERATED,
                 ZonedDateTime.now(ZoneOffset.UTC), count);
         plots.add(new Plot("Watt-Hours Generated", generated));
 
         // Get kWhUsed measurements
-        List<Measurement> used = metricDao.getRecent(siteId, MetricUnit.WH_USED,
+        final List<Measurement> used = metricDao.getRecent(siteId, MetricUnit.WH_USED,
                 ZonedDateTime.now(ZoneOffset.UTC), count);
         plots.add(new Plot("Watt-Hours Used", used));
 

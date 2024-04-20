@@ -29,7 +29,7 @@ public class SiteResource {
     @GET
     @Path("/{id}")
     public Response getSite(@PathParam("id") Long id) {
-        Site site = siteDao.findById(id);
+        final Site site = siteDao.findById(id);
         if (site == null) {
             return Response.noContent().status(404).build();
         }
